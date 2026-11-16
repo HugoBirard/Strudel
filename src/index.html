@@ -3,15 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <title>Strudel Studio</title>
+  <!-- Content Security Policy (Sécurité Web renforcée contre XSS et injections) -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' https:; media-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' https: blob:; style-src 'self' 'unsafe-inline' https:; connect-src 'self' https: blob: data:; font-src 'self' https: data:;">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="theme-obsidian">
 
-  <!-- 1. TOP TRANSPORT BAR -->
+  <!-- 1. TOP TRANSPORT BAR (VISUEL PREMIUM GLASSMORPHISM) -->
   <header class="transport-bar">
     <!-- Brand -->
     <div class="brand">
-      <div class="brand-logo">
+      <div class="brand-logo" title="Strudel Studio Desktop">
         <svg class="svg-icon" viewBox="0 0 24 24">
           <path d="M2 12h3l2-7 4 14 4-10 2 6h5" />
         </svg>
@@ -58,6 +60,15 @@
 
     <!-- Top Right Actions -->
     <div class="top-actions">
+      <!-- Theme & Background Picker -->
+      <button id="btn-theme" class="btn-theme" title="Personnaliser le thème et l'arrière-plan">
+        <svg class="svg-icon" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+        </svg>
+        <span>Thème</span>
+      </button>
+
       <!-- New File -->
       <button id="btn-new" class="btn-action" title="Nouveau projet">
         <svg class="svg-icon" viewBox="0 0 24 24">
@@ -136,14 +147,14 @@
     <section class="center-editor-container">
       <div class="editor-header">
         <div class="file-tab">
-          <svg class="svg-icon" viewBox="0 0 24 24" style="color: #6366f1;">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="color: var(--primary);">
             <polyline points="16 18 22 12 16 6" />
             <polyline points="8 6 2 12 8 18" />
           </svg>
           <span id="current-filename">mon_morceau.strudel</span>
         </div>
-        <div style="font-size: 11px; color: #64748b;">
-          <kbd style="background: #181c2c; padding: 2px 5px; border-radius: 4px; border: 1px solid #282f49;">Ctrl + Entrée</kbd> pour Évaluer
+        <div style="font-size: 11px; color: var(--text-muted);">
+          <kbd style="background: rgba(0,0,0,0.3); padding: 2px 5px; border-radius: 4px; border: 1px solid var(--border);">Ctrl + Entrée</kbd> pour Évaluer
         </div>
       </div>
 
@@ -156,7 +167,7 @@
           <span style="font-size: 14px;">●</span>
           <span id="status-text">Prêt (Arrêté)</span>
         </div>
-        <div style="color: #64748b; font-size: 11px;">
+        <div style="color: var(--text-muted); font-size: 11px;">
           Moteur : WebAudio Headless Superdough
         </div>
       </div>
@@ -168,7 +179,7 @@
       <div class="visualizer-card">
         <div class="panel-header" style="padding: 0 0 6px 0; border: none;">
           <span>Visualiseur Audio</span>
-          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; color: #10b981;">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; color: var(--accent);">
             <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
           </svg>
         </div>
@@ -225,12 +236,93 @@
 
   </main>
 
-  <!-- 3. MODAL DE CRÉATION DE SNIPPET -->
+  <!-- 3. MODAL DE PERSONNALISATION DU THÈME & FOND -->
+  <div id="theme-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="color: var(--primary);">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+          </svg>
+          <span>Personnalisation du Thème & Arrière-Plan</span>
+        </div>
+        <button id="btn-close-theme-modal" class="tempo-btn" style="width: 24px; height: 24px;">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <p>Choisissez l'ambiance visuelle de votre studio de live coding :</p>
+        <div class="theme-grid">
+          <!-- 1. Obsidian -->
+          <div class="theme-card active" data-theme="theme-obsidian">
+            <div class="theme-preview-dot" style="background: #10b981; border: 2px solid #6366f1;"></div>
+            <div class="theme-card-info">
+              <span class="theme-name">Obsidian Dark</span>
+              <span class="theme-desc">Noir pur, touches émeraude et indigo</span>
+            </div>
+          </div>
+
+          <!-- 2. Cyberpunk -->
+          <div class="theme-card" data-theme="theme-cyberpunk">
+            <div class="theme-preview-dot" style="background: #06b6d4; border: 2px solid #ec4899;"></div>
+            <div class="theme-card-info">
+              <span class="theme-name">Cyberpunk Night</span>
+              <span class="theme-desc">Néon cyan, rose fuchsia et violet électrique</span>
+            </div>
+          </div>
+
+          <!-- 3. Tokyo Midnight -->
+          <div class="theme-card" data-theme="theme-tokyo">
+            <div class="theme-preview-dot" style="background: #8b5cf6; border: 2px solid #38bdf8;"></div>
+            <div class="theme-card-info">
+              <span class="theme-name">Tokyo Midnight</span>
+              <span class="theme-desc">Violet profond, bleu nuit et indigo</span>
+            </div>
+          </div>
+
+          <!-- 4. Deep Space -->
+          <div class="theme-card" data-theme="theme-space">
+            <div class="theme-preview-dot" style="background: #3b82f6; border: 2px solid #22d3ee;"></div>
+            <div class="theme-card-info">
+              <span class="theme-name">Deep Space</span>
+              <span class="theme-desc">Bleu galactique cosmique et touches cyan</span>
+            </div>
+          </div>
+
+          <!-- 5. Matrix Emerald -->
+          <div class="theme-card" data-theme="theme-matrix">
+            <div class="theme-preview-dot" style="background: #10b981; border: 2px solid #059669;"></div>
+            <div class="theme-card-info">
+              <span class="theme-name">Matrix Emerald</span>
+              <span class="theme-desc">Vert phosphore terminal et noir sombre</span>
+            </div>
+          </div>
+
+          <!-- 6. Retro Synthwave -->
+          <div class="theme-card" data-theme="theme-synthwave">
+            <div class="theme-preview-dot" style="background: #f59e0b; border: 2px solid #f43f5e;"></div>
+            <div class="theme-card-info">
+              <span class="theme-name">Retro Synthwave</span>
+              <span class="theme-desc">Coucher de soleil orange 80s et magenta</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btn-close-theme" class="btn-play" style="padding: 7px 18px;">
+          <span>Appliquer</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. MODAL DE CRÉATION DE SNIPPET -->
   <div id="snippet-modal" class="modal-overlay">
     <div class="modal-card">
       <div class="modal-header">
         <div class="modal-title">
-          <svg class="svg-icon" viewBox="0 0 24 24" style="color: #6366f1;">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="color: var(--primary);">
             <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
             <polyline points="17 21 17 13 7 13 7 21" />
             <polyline points="7 3 7 8 15 8" />
@@ -257,12 +349,12 @@
     </div>
   </div>
 
-  <!-- 4. MODAL DE MISE À JOUR -->
+  <!-- 5. MODAL DE MISE À JOUR -->
   <div id="update-modal" class="modal-overlay">
     <div class="modal-card">
       <div class="modal-header">
         <div class="modal-title">
-          <svg class="svg-icon" viewBox="0 0 24 24" style="color: #6366f1;">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="color: var(--primary);">
             <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
           </svg>
           <span id="modal-update-title">Mise à jour disponible</span>

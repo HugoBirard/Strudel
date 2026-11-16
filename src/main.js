@@ -1,9 +1,9 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
-const { exec } = require('child_process');
+const { execFile } = require('child_process');
 const util = require('util');
-const execPromise = util.promisify(exec);
+const execFilePromise = util.promisify(execFile);
 
 let mainWindow;
 
@@ -20,8 +20,24 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
       contextIsolation: true,
-      webSecurity: false
+      webSecurity: true, // Sécurité Web activée (Protection SOP / CSP)
+      sandbox: false
     }
+  });
+
+  // Protection Navigation : empêche l'injection d'URL distantes malveillantes
+  mainWindow.webContents.on('will-navigate', (event, url) => {
+    if (!url.startsWith('file://')) {
+      event.preventDefault();
+    }
+  });
+
+  // Sécurité : ouverture des liens externes dans le navigateur système de l'OS
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      shell.openExternal(url);
+    }
+    return { action: 'deny' };
   });
 
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
@@ -31,7 +47,7 @@ function createWindow() {
   });
 }
 
-// 1. DIALOGUES DE FICHIERS NATIFS
+// 1. DIALOGUES DE FICHIERS NATIFS SÉCURISÉS
 ipcMain.handle('dialog:openFile', async () => {
   const { canceled, filePaths } = await dialog.showOpenDialog(mainWindow, {
     title: 'Ouvrir un morceau Strudel',
@@ -45,18 +61,28 @@ ipcMain.handle('dialog:openFile', async () => {
   if (canceled || filePaths.length === 0) return null;
 
   try {
-    const content = fs.readFileSync(filePaths[0], 'utf-8');
-    return { path: filePaths[0], content, filename: path.basename(filePaths[0]) };
+    const filePath = filePaths[0];
+    // Validation du chemin
+    if (typeof filePath !== 'string' || !fs.existsSync(filePath)) return null;
+
+    const content = fs.readFileSync(filePath, 'utf-8');
+    return { path: filePath, content, filename: path.basename(filePath) };
   } catch (err) {
     console.error('Erreur lecture fichier:', err);
     return null;
   }
 });
 
-ipcMain.handle('dialog:saveFile', async (event, { content, defaultPath }) => {
+ipcMain.handle('dialog:saveFile', async (event, data) => {
+  if (!data || typeof data.content !== 'string') return null;
+
+  const defaultPath = typeof data.defaultPath === 'string' && data.defaultPath.trim() 
+    ? path.basename(data.defaultPath.trim()) 
+    : 'mon_pattern.strudel';
+
   const { canceled, filePath } = await dialog.showSaveDialog(mainWindow, {
     title: 'Sauvegarder le morceau',
-    defaultPath: defaultPath || 'mon_pattern.strudel',
+    defaultPath: defaultPath,
     filters: [
       { name: 'Fichier Strudel', extensions: ['strudel'] },
       { name: 'Fichier JavaScript', extensions: ['js'] }
@@ -66,7 +92,7 @@ ipcMain.handle('dialog:saveFile', async (event, { content, defaultPath }) => {
   if (canceled || !filePath) return null;
 
   try {
-    fs.writeFileSync(filePath, content, 'utf-8');
+    fs.writeFileSync(filePath, data.content, 'utf-8');
     return { path: filePath, filename: path.basename(filePath) };
   } catch (err) {
     console.error('Erreur sauvegarde:', err);
@@ -74,13 +100,17 @@ ipcMain.handle('dialog:saveFile', async (event, { content, defaultPath }) => {
   }
 });
 
-// 2. SYSTÈME DE VÉRIFICATION ET INSTALLATION DE MISES À JOUR
+// 2. SYSTÈME SÉCURISÉ DE VÉRIFICATION ET INSTALLATION DE MISES À JOUR
 const APP_ROOT = path.join(__dirname, '..');
+
+// Regex de validation stricte pour les noms de branches Git (évite toute injection de commande)
+const VALID_BRANCH_REGEX = /^[a-zA-Z0-9_\-\.\/]+$/;
 
 async function getCurrentBranch() {
   try {
-    const { stdout } = await execPromise('git rev-parse --abbrev-ref HEAD', { cwd: APP_ROOT });
-    return stdout.trim() || 'main';
+    const { stdout } = await execFilePromise('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: APP_ROOT });
+    const branch = stdout.trim();
+    return VALID_BRANCH_REGEX.test(branch) ? branch : 'main';
   } catch (e) {
     return 'main';
   }
@@ -89,18 +119,19 @@ async function getCurrentBranch() {
 ipcMain.handle('updater:check', async () => {
   try {
     const branch = await getCurrentBranch();
-    // 1. Récupération des nouveautés distantes
-    await execPromise(`git fetch origin ${branch}`, { cwd: APP_ROOT });
+
+    // 1. Récupération des nouveautés distantes (avec execFile sécurisé sans shell)
+    await execFilePromise('git', ['fetch', 'origin', branch], { cwd: APP_ROOT });
 
     // 2. Comparaison des hash commits
-    const { stdout: localStdout } = await execPromise('git rev-parse --short HEAD', { cwd: APP_ROOT });
-    const { stdout: remoteStdout } = await execPromise(`git rev-parse --short origin/${branch}`, { cwd: APP_ROOT });
+    const { stdout: localStdout } = await execFilePromise('git', ['rev-parse', '--short', 'HEAD'], { cwd: APP_ROOT });
+    const { stdout: remoteStdout } = await execFilePromise('git', ['rev-parse', '--short', `origin/${branch}`], { cwd: APP_ROOT });
 
     const localCommit = localStdout.trim();
     const remoteCommit = remoteStdout.trim();
 
     if (localCommit !== remoteCommit) {
-      const { stdout: logStdout } = await execPromise(`git log HEAD..origin/${branch} --oneline`, { cwd: APP_ROOT });
+      const { stdout: logStdout } = await execFilePromise('git', ['log', `HEAD..origin/${branch}`, '--oneline'], { cwd: APP_ROOT });
       return {
         hasUpdate: true,
         currentVersion: localCommit,
@@ -123,11 +154,12 @@ ipcMain.handle('updater:check', async () => {
 ipcMain.handle('updater:install', async () => {
   try {
     const branch = await getCurrentBranch();
-    // 1. Mise à jour du code via git pull sur la branche courante
-    await execPromise(`git pull origin ${branch}`, { cwd: APP_ROOT });
 
-    // 2. Mise à jour des paquets npm si nécessaire
-    await execPromise('npm install', { cwd: APP_ROOT });
+    // 1. Mise à jour du code via git pull sécurisé
+    await execFilePromise('git', ['pull', 'origin', branch], { cwd: APP_ROOT });
+
+    // 2. Mise à jour des paquets npm
+    await execFilePromise('npm', ['install'], { cwd: APP_ROOT });
 
     return { success: true };
   } catch (err) {

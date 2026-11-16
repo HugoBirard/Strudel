@@ -18,7 +18,37 @@ let audioContext = null;
 // L'éditeur commence vierge (aucun code pré-fait)
 const DEFAULT_CODE = "";
 
-// 3. GESTION DES SNIPPETS PERSONNALISÉS DE L'UTILISATEUR
+// 3. GESTION DU THÈME ET DE LA PERSONNALISATION DE FOND
+const THEME_STORAGE_KEY = 'strudel_active_theme';
+
+function loadSavedTheme() {
+  const saved = localStorage.getItem(THEME_STORAGE_KEY) || 'theme-obsidian';
+  applyTheme(saved);
+}
+
+function applyTheme(themeClass) {
+  document.body.className = themeClass;
+  localStorage.setItem(THEME_STORAGE_KEY, themeClass);
+
+  // Mise à jour de l'état actif dans la grille
+  document.querySelectorAll('.theme-card').forEach(card => {
+    if (card.getAttribute('data-theme') === themeClass) {
+      card.classList.add('active');
+    } else {
+      card.classList.remove('active');
+    }
+  });
+}
+
+function openThemeModal() {
+  document.getElementById('theme-modal').classList.add('open');
+}
+
+function closeThemeModal() {
+  document.getElementById('theme-modal').classList.remove('open');
+}
+
+// 4. GESTION DES SNIPPETS PERSONNALISÉS DE L'UTILISATEUR
 const SNIPPETS_STORAGE_KEY = 'strudel_user_snippets';
 
 function getUserSnippets() {
@@ -74,7 +104,7 @@ function renderUserSnippets() {
           </button>
         </div>
       </div>
-      <div class="snippet-card-preview" title="Cliquer pour insérer au curseur" data-action="insert" data-id="${snippet.id}">${escapeHtml(snippet.code)}</div>
+      <div class="snippet-card-preview" title="Cliquer pour insérer exactement au curseur" data-action="insert" data-id="${snippet.id}">${escapeHtml(snippet.code)}</div>
       <button class="btn-insert-snippet" data-action="insert" data-id="${snippet.id}">
         <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
           <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -98,27 +128,22 @@ function renderUserSnippets() {
   });
 }
 
+// CORRECTION BUG : Insertion exacte au curseur SANS forcer de saut de ligne
 function insertSnippetIntoEditor(code) {
   const editor = document.getElementById('code-editor');
+  editor.focus();
+
   const start = editor.selectionStart;
   const end = editor.selectionEnd;
   const currentText = editor.value;
 
-  // Si l'éditeur est vide, on remplace simplement
-  if (!currentText.trim()) {
-    editor.value = code;
-    editor.focus();
-    return;
-  }
-
-  // Sinon on insère au curseur
-  const prefix = (start > 0 && currentText[start - 1] !== '\n') ? '\n' : '';
-  const suffix = (end < currentText.length && currentText[end] !== '\n') ? '\n' : '';
-  editor.value = currentText.substring(0, start) + prefix + code + suffix + currentText.substring(end);
-
-  editor.focus();
-  const newPos = start + prefix.length + code.length;
+  // Insertion exacte au curseur sans ajout de '\n' intempestif
+  editor.value = currentText.substring(0, start) + code + currentText.substring(end);
+  const newPos = start + code.length;
   editor.setSelectionRange(newPos, newPos);
+
+  // Notifie le changement
+  editor.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
 function deleteUserSnippet(id) {
@@ -150,7 +175,7 @@ function confirmSaveSnippet() {
   const codeInput = document.getElementById('input-snippet-code');
 
   const title = nameInput.value.trim() || 'Ligne personnalisée';
-  const code = codeInput.value.trim();
+  const code = codeInput.value;
 
   if (!code) {
     alert('Veuillez renseigner le code ou la ligne à sauvegarder.');
@@ -175,7 +200,7 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-// 4. INITIALISATION DU MOTEUR STRUDEL HEADLESS
+// 5. INITIALISATION DU MOTEUR STRUDEL HEADLESS
 async function ensureEngine() {
   if (!repl) {
     updateStatus('Initialisation du moteur audio...', 'stopped');
@@ -206,7 +231,7 @@ async function ensureEngine() {
   return repl;
 }
 
-// 5. TRANSPORT AUDIO (PLAY / STOP)
+// 6. TRANSPORT AUDIO (PLAY / STOP)
 async function play() {
   try {
     const code = document.getElementById('code-editor').value.trim();
@@ -254,7 +279,7 @@ function updateStatus(text, state) {
   textEl.textContent = text;
 }
 
-// 6. MÉTRONOME VISUEL (4 TEMPS)
+// 7. MÉTRONOME VISUEL (4 TEMPS)
 function startMetro() {
   stopMetro();
   const beatIntervalMs = (60 / currentBpm) * 1000;
@@ -284,7 +309,7 @@ function stopMetro() {
   }
 }
 
-// 7. VISUALISEUR AUDIO CANVAS (Oscilloscope)
+// 8. VISUALISEUR AUDIO CANVAS (Oscilloscope)
 function startVisualizer() {
   const canvas = document.getElementById('oscilloscope');
   const ctx = canvas.getContext('2d');
@@ -302,10 +327,10 @@ function startVisualizer() {
       }
     }
 
-    ctx.fillStyle = '#06070a';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.strokeStyle = '#141824';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(0, canvas.height / 2);
@@ -313,7 +338,7 @@ function startVisualizer() {
     ctx.stroke();
 
     ctx.lineWidth = 2;
-    ctx.strokeStyle = isPlaying ? '#10b981' : '#334155';
+    ctx.strokeStyle = isPlaying ? '#10b981' : '#475569';
     ctx.beginPath();
 
     const sliceWidth = (canvas.width * 1.0) / bufferLength;
@@ -338,7 +363,7 @@ function startVisualizer() {
   draw();
 }
 
-// 8. GESTION DES MISES À JOUR
+// 9. GESTION DES MISES À JOUR
 async function checkUpdates(silent = false) {
   const btnUpdate = document.getElementById('btn-update');
   const updateIcon = document.getElementById('update-icon');
@@ -421,21 +446,36 @@ async function triggerInstallUpdate() {
   }
 }
 
-// 9. INITIALISATION DES CONTRÔLES
+// 10. INITIALISATION DES CONTRÔLES
 document.addEventListener('DOMContentLoaded', () => {
   const editor = document.getElementById('code-editor');
+
+  // Charge le thème personnalisé sauvegardé
+  loadSavedTheme();
 
   // Éditeur vierge
   editor.value = DEFAULT_CODE;
 
-  // Rendu initial des snippets de l'utilisateur
+  // Rendu des snippets de l'utilisateur
   renderUserSnippets();
+
+  // Bouton Thème
+  document.getElementById('btn-theme').onclick = openThemeModal;
+  document.getElementById('btn-close-theme-modal').onclick = closeThemeModal;
+  document.getElementById('btn-close-theme').onclick = closeThemeModal;
+
+  document.querySelectorAll('.theme-card').forEach(card => {
+    card.onclick = () => {
+      const theme = card.getAttribute('data-theme');
+      applyTheme(theme);
+    };
+  });
 
   // Bouton : Sauvegarder la sélection de l'éditeur
   document.getElementById('btn-save-selection').onclick = () => {
     const start = editor.selectionStart;
     const end = editor.selectionEnd;
-    let selectedText = editor.value.substring(start, end).trim();
+    let selectedText = editor.value.substring(start, end);
 
     // Si aucune sélection explicite, on prend la ligne courante où se trouve le curseur
     if (!selectedText) {
@@ -443,7 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
       let charCount = 0;
       for (const line of allLines) {
         if (start >= charCount && start <= charCount + line.length) {
-          selectedText = line.trim();
+          selectedText = line;
           break;
         }
         charCount += line.length + 1;
