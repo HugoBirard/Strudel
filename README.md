@@ -5,8 +5,9 @@
 ---
 
 ## 📑 Sommaire
-1. [Introduction & Principes de base](#1-introduction--principes-de-base)
-2. [Toutes les Catégories d'Instruments & Banques Sonores](#2-toutes-les-catégories-dinstruments--banques-sonores)
+1. [Tutoriel Débutant : Composer un Morceau Étape par Étape (avec Liens d'Écoute)](#-tutoriel-débutant--composer-un-morceau-étape-par-étape-avec-liens-découte)
+2. [Introduction & Principes de base](#1-introduction--principes-de-base)
+3. [Toutes les Catégories d'Instruments & Banques Sonores](#2-toutes-les-catégories-dinstruments--banques-sonores)
    - [A. Synthétiseurs WebAudio internes (Superdough)](#a-synthétiseurs-webaudio-internes-superdough)
    - [B. Les Soundfonts General MIDI (`gm_*`) — 128 Instruments](#b-les-soundfonts-general-midi-gm_--128-instruments)
    - [C. Boîtes à rythmes classiques (`.bank(...)`)](#c-boîtes-à-rythmes-classiques-bank)
@@ -15,11 +16,142 @@
    - [F. Générateur d'effets Chiptune (ZZFX)](#f-générateur-deffets-chiptune-zzfx)
    - [G. Charger ses propres Samples (GitHub / URLs externes)](#g-charger-ses-propres-samples-github--urls-externes)
    - [H. Contrôle MIDI externe (Web MIDI)](#h-contrôle-midi-externe-web-midi)
-3. [La Mini-Notation (Rythme et Patterns)](#3-la-mini-notation-rythme-et-patterns)
-4. [Harmonie, Notes et Accords](#4-harmonie-notes-et-accords)
-5. [Effets Audio & Modulation](#5-effets-audio--modulation)
-6. [Fonctions de Transformation Algorithmique](#6-fonctions-de-transformation-algorithmique)
-7. [Exemples Complets & Prêts à Jouer](#7-exemples-complets--prêts-à-jouer)
+4. [La Mini-Notation (Rythme et Patterns)](#3-la-mini-notation-rythme-et-patterns)
+5. [Harmonie, Notes et Accords](#4-harmonie-notes-et-accords)
+6. [Effets Audio & Modulation](#5-effets-audio--modulation)
+7. [Fonctions de Transformation Algorithmique](#6-fonctions-de-transformation-algorithmique)
+8. [Exemples Complets Prêts à Jouer](#7-exemples-complets--prêts-à-jouer)
+
+---
+
+## 🎧 Tutoriel Débutant : Composer un Morceau Étape par Étape (avec Liens d'Écoute)
+
+Pour un débutant, produire un morceau se fait couche par couche, de la pulsation corporelle jusqu'aux finesses mélodiques. Cliquez sur les liens **▶️ Écouter sur Strudel.cc** pour charger et entendre immédiatement chaque étape dans votre navigateur !
+
+---
+
+### Étape 1 : Le Tempo & le Kick (La pulsation cardiaque)
+On commence toujours par fixer la vitesse (`setcps` en cycles par seconde) et poser le rythme de base (4 coups de grosse caisse réguliers).
+
+```javascript
+setcps(128/60/4)
+s("bd*4")
+```
+👉 **[▶️ Écouter l'Étape 1 sur Strudel.cc](https://strudel.cc/#setcps(128%2F60%2F4)%0As(%22bd*4%22))**
+
+---
+
+### Étape 2 : Le Contretemps (Clap / Caisse Claire sur les temps 2 et 4)
+On ajoute le clap `cp` sur les temps pairs pour donner le rebond et la signature rythmique, ici avec la boîte à rythmes `RolandTR909`.
+
+```javascript
+setcps(128/60/4)
+s("bd [~ cp] bd [~ cp]").bank("RolandTR909")
+```
+👉 **[▶️ Écouter l'Étape 2 sur Strudel.cc](https://strudel.cc/#setcps(128%2F60%2F4)%0As(%22bd%20%5B~%20cp%5D%20bd%20%5B~%20cp%5D%22).bank(%22RolandTR909%22))**
+
+---
+
+### Étape 3 : Le Groove des Charleston (Hi-Hats en doubles-croches)
+Pour que la batterie prenne vie et avance, on superpose (`stack`) des charlestons fermés `hh` et un charleston ouvert `oh` sur le contretemps.
+
+```javascript
+setcps(128/60/4)
+
+stack(
+  s("bd [~ cp] bd [~ cp]").bank("RolandTR909"),
+  s("hh*8 [oh hh]").gain(0.8)
+)
+```
+👉 **[▶️ Écouter l'Étape 3 sur Strudel.cc](https://strudel.cc/#setcps(128%2F60%2F4)%0Astack(%0A%20%20s(%22bd%20%5B~%20cp%5D%20bd%20%5B~%20cp%5D%22).bank(%22RolandTR909%22)%2C%0A%20%20s(%22hh*8%20%5Boh%20hh%5D%22).gain(0.8)%0A))**
+
+---
+
+### Étape 4 : La Ligne de Basse (L'Énergie & la Note Fondamentale)
+La basse connecte la batterie à l'harmonie. On utilise une onde en dents de scie (`sawtooth`) sculptée avec un filtre passe-bas (`lpf`) et de la résonance (`lpq`).
+
+```javascript
+setcps(128/60/4)
+
+stack(
+  s("bd [~ cp] bd [~ cp]").bank("RolandTR909"),
+  s("hh*8 [oh hh]").gain(0.8),
+  note("c2 [~ c2] eb2 [~ f2] g2 [~ bb1] c2 ~")
+    .s("sawtooth")
+    .lpf(850).lpq(6).decay(0.3).sustain(0.1)
+)
+```
+👉 **[▶️ Écouter l'Étape 4 sur Strudel.cc](https://strudel.cc/#setcps(128%2F60%2F4)%0Astack(%0A%20%20s(%22bd%20%5B~%20cp%5D%20bd%20%5B~%20cp%5D%22).bank(%22RolandTR909%22)%2C%0A%20%20s(%22hh*8%20%5Boh%20hh%5D%22).gain(0.8)%2C%0A%20%20note(%22c2%20%5B~%20c2%5D%20eb2%20%5B~%20f2%5D%20g2%20%5B~%20bb1%5D%20c2%20~%22)%0A%20%20%20%20.s(%22sawtooth%22)%0A%20%20%20%20.lpf(850).lpq(6).decay(0.3).sustain(0.1)%0A))**
+
+---
+
+### Étape 5 : L'Harmonie (Progression d'Accords & Émotion)
+On habille le morceau avec une grille d'accords jouée sur un piano électrique vintage Rhodes (`gm_electric_piano_1`) avec de la réverbération (`room`).
+Grille : Do mineur 7 -> Lab majeur 7 -> Mib majeur 7 -> Sib 7.
+
+```javascript
+setcps(128/60/4)
+
+note("<[c3'm7] [ab2'maj7] [eb3'maj7] [bb2'dom7]>")
+  .s("gm_electric_piano_1")
+  .slow(2)
+  .room(0.6)
+  .lpf(1600)
+```
+👉 **[▶️ Écouter l'Étape 5 sur Strudel.cc](https://strudel.cc/#setcps(128%2F60%2F4)%0Anote(%22%3C%5Bc3%27m7%5D%20%5Bab2%27maj7%5D%20%5Beb3%27maj7%5D%20%5Bbb2%27dom7%5D%3E%22)%0A%20%20.s(%22gm_electric_piano_1%22)%0A%20%20.slow(2)%0A%20%20.room(0.6)%0A%20%20.lpf(1600))**
+
+---
+
+### Étape 6 : La Mélodie & l'Arpège (Le Thème Céleste)
+On crée une mélodie accrocheuse en brisant les accords en arpège (`.arp("updown")`) sur un vibraphone (`gm_vibraphone`) avec du delay.
+
+```javascript
+setcps(128/60/4)
+
+note("<c4'm7 ab3'maj7 eb4'maj7 bb3'dom7>")
+  .arp("updown")
+  .s("gm_vibraphone")
+  .delay(0.4)
+  .delaytime(0.25)
+  .gain(0.8)
+```
+👉 **[▶️ Écouter l'Étape 6 sur Strudel.cc](https://strudel.cc/#setcps(128%2F60%2F4)%0Anote(%22%3Cc4%27m7%20ab3%27maj7%20eb4%27maj7%20bb3%27dom7%3E%22)%0A%20%20.arp(%22updown%22)%0A%20%20.s(%22gm_vibraphone%22)%0A%20%20.delay(0.4)%0A%20%20.delaytime(0.25)%0A%20%20.gain(0.8))**
+
+---
+
+### Étape 7 : Le Morceau Complet Assemblé
+On rassemble l'ensemble des éléments dans un seul bloc `stack(...)` : le beat, la basse, les accords et l'arpège jouent en symbiose parfaite.
+
+```javascript
+setcps(128/60/4)
+
+stack(
+  // 1 & 2. Batterie Kick + Clap 909
+  s("bd [~ cp] bd [~ cp]").bank("RolandTR909"),
+  
+  // 3. Hi-Hats groove
+  s("hh*8 [oh hh]").gain(0.75),
+  
+  // 4. Ligne de basse filtrée
+  note("c2 [~ c2] eb2 [~ f2] g2 [~ bb1] c2 ~")
+    .s("sawtooth")
+    .lpf(850).lpq(6).decay(0.3).sustain(0.1),
+    
+  // 5. Progression d'accords Rhodes
+  note("<[c3'm7] [ab2'maj7] [eb3'maj7] [bb2'dom7]>")
+    .s("gm_electric_piano_1")
+    .slow(2).room(0.6).lpf(1600).gain(0.8),
+    
+  // 6. Arpège mélodique au Vibraphone
+  note("<c4'm7 ab3'maj7 eb4'maj7 bb3'dom7>")
+    .arp("updown")
+    .s("gm_vibraphone")
+    .delay(0.4).delaytime(0.25).gain(0.7)
+)
+```
+👉 **[▶️ Écouter le Morceau Complet sur Strudel.cc](https://strudel.cc/#setcps(128%2F60%2F4)%0Astack(%0A%20%20s(%22bd%20%5B~%20cp%5D%20bd%20%5B~%20cp%5D%22).bank(%22RolandTR909%22)%2C%0A%20%20s(%22hh*8%20%5Boh%20hh%5D%22).gain(0.75)%2C%0A%20%20note(%22c2%20%5B~%20c2%5D%20eb2%20%5B~%20f2%5D%20g2%20%5B~%20bb1%5D%20c2%20~%22)%0A%20%20%20%20.s(%22sawtooth%22)%0A%20%20%20%20.lpf(850).lpq(6).decay(0.3).sustain(0.1)%2C%0A%20%20note(%22%3C%5Bc3%27m7%5D%20%5Bab2%27maj7%5D%20%5Beb3%27maj7%5D%20%5Bbb2%27dom7%5D%3E%22)%0A%20%20%20%20.s(%22gm_electric_piano_1%22)%0A%20%20%20%20.slow(2).room(0.6).lpf(1600).gain(0.8)%2C%0A%20%20note(%22%3Cc4%27m7%20ab3%27maj7%20eb4%27maj7%20bb3%27dom7%3E%22)%0A%20%20%20%20.arp(%22updown%22)%0A%20%20%20%20.s(%22gm_vibraphone%22)%0A%20%20%20%20.delay(0.4).delaytime(0.25).gain(0.7)%0A))**
+
+---
 
 ---
 
