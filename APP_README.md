@@ -1,46 +1,47 @@
 # ⚡ Strudel Studio (Application Desktop Dédiée)
 
-Une application Desktop complète de live-coding musical basée sur le moteur sonore de **Strudel**, débarrassée de toute l'interface par défaut de strudel.cc pour vous offrir votre propre environnement DAW sur-mesure.
+Application Desktop professionnelle de live-coding musical basée sur le moteur sonore de **Strudel**, épurée de toute interface tierce, avec design moderne aux icônes vectorielles SVG, raccourci de bureau et système de mise à jour intégré.
 
 ---
 
 ## 🚀 Démarrage Rapide
 
-Dans le terminal :
-
+### Option A : Depuis le Terminal
 ```bash
-# 1. Installer les dépendances (si ce n'est pas déjà fait)
-npm install
+# 1. Se placer sur la branche app
+git checkout app
 
-# 2. Lancer l'application Desktop
+# 2. Lancer l'application
 npm start
+```
+
+### Option B : Depuis votre Bureau ou Menu d'applications
+Un raccourci **Strudel Studio** a été installé :
+- Sur votre **Bureau** (`~/Desktop/strudel-studio.desktop` ou `~/Bureau/strudel-studio.desktop`)
+- Dans votre **Menu d'applications système** (`~/.local/share/applications/strudel-studio.desktop`)
+
+Pour réinstaller ou mettre à jour le raccourci :
+```bash
+npm run install-shortcut
 ```
 
 ---
 
-## 🎛️ Ce qui a été personnalisé (Votre Interface)
+## 🎨 Interface 100% Épurée & Sur-Mesure
 
-1. **Barre de Transport Supérieure** :
-   - Bouton **PLAY** lumineux (raccourci `Ctrl + Entrée`).
-   - Bouton **STOP** immédiat (raccourci `Ctrl + .`).
-   - **Métronome Visuel 4 Temps** : 4 LED dynamiques qui clignotent en temps réel au rythme de vos cycles.
-   - **Contrôleur de BPM** : Ajustement direct du tempo, boutons +/- et bouton **TAP TEMPO**.
-   - **Gestion de fichiers natifs** : Ouvrir et Sauvegarder vos fichiers `.strudel` directement sur votre disque dur.
+1. **Design Moderne (Icônes Vectorielles SVG)** :
+   - Tous les emojis ont été remplacés par des icônes SVG précises et minimalistes (Play, Stop, Fichiers, Outils, Mise à jour).
+   - Les presets encombrants ont été retirés pour laisser place à un projet propre dès l'ouverture.
 
-2. **Panneau Latéral Gauche (Presets & Insertion)** :
-   - **6 Presets complets intégrés** : Techno Acid 303, Jungle Amen Break, Lo-Fi Rhodes, Synthwave 80s, Ambient Éthéré, Minimal Groovy.
-   - **Boutons d'insertion 1-clic** : Ajoutez instantanément un beat 909, une ligne de basse, des charlestons, un piano Rhodes ou un découpage de breakbeat à l'endroit de votre curseur.
+2. **Générateur & Explorateur d'Instruments (Panneau de Gauche)** :
+   - **Snippets Rapides** : Insérez en un clic un Beat 909, Beat 808, Hi-Hats, Acid 303, Sub Bass, Rhodes ou Amen Break directement dans votre code au curseur.
+   - **Explorateur de Sons** : Cliquez sur n'importe quelle boîte à rythmes (`RolandTR909`, `RolandTR808`, `AkaiLinn`...), Soundfont General MIDI (`gm_piano`, `gm_vibraphone`, `gm_strings`...) ou synthétiseur natif (`sawtooth`, `sine`, `crackle`) pour l'insérer instantanément.
 
-3. **Éditeur Central Dédié** :
-   - Police monospace claire avec coloration moderne.
-   - Évaluation instantanée sans rechargement.
-   - Barre d'état en temps réel indiquant les erreurs de syntaxe éventuelles sans bloquer l'application.
+3. **Système de Recherche et d'Installation de Mises à Jour** :
+   - Un bouton **Mises à jour** dans la barre supérieure vérifie automatiquement la présence de nouvelles versions sur le dépôt GitHub distant.
+   - Si une nouvelle version est disponible, une pastille lumineuse apparaît et une fenêtre présente les détails du changelog.
+   - Un clic sur **"Installer et Redémarrer"** effectue la mise à jour et relance l'application automatiquement !
 
-4. **Panneau Latéral Droit (Sound Design & Visuels)** :
-   - **Visualiseur Audio Oscilloscope en Temps Réel** : Dessine l'onde sonore générée par Web Audio sur un Canvas fluide.
-   - **4 Macro-Contrôleurs en Direct** :
-     - `macroLPF` : Fréquence de coupure du filtre passe-bas (utilisable directement dans votre code : `.lpf(macroLPF)`).
-     - `macroLPQ` : Résonance du filtre.
-     - `macroRoom` : Taux de réverbération / espace.
-     - `Volume Général` : Atténuation générale.
-   - **Aide-Mémoire Sons Rapide** : Noms des banques de boîtes à rythmes (909, 808, LinnDrum...) et Soundfonts General MIDI.
+4. **Macros en Direct & Visualiseur Audio Oscilloscope (Panneau de Droite)** :
+   - Oscilloscope temps réel connecté à la sortie Web Audio.
+   - Sliders `macroLPF` (Cutoff), `macroLPQ` (Résonance), `macroRoom` (Reverb) et `masterVolume` modifiables à la souris en plein jeu sans interrompre la musique.

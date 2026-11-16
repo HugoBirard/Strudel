@@ -5,7 +5,8 @@
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
-    "dev": "electron ."
+    "dev": "electron .",
+    "install-shortcut": "bash scripts/install-shortcut.sh"
   },
   "keywords": [
     "strudel",

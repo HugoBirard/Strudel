@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Strudel Studio
+GenericName=Live-Coding DAW
+Comment=Studio de Live Coding musical Strudel sans interface tierce
+Exec=bash -c "cd /home/algaarad/Documents/dev/Strudel && npm start"
+Icon=/home/algaarad/Documents/dev/Strudel/assets/icon.svg
+Terminal=false
+Categories=AudioVideo;Audio;AudioVideoEditing;Development;
+Keywords=strudel;livecoding;music;synth;audio;midi;
+StartupWMClass=strudel-studio

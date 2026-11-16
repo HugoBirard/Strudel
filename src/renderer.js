@@ -14,137 +14,25 @@ let metroInterval = null;
 let currentBeat = 0;
 let analyserNode = null;
 let audioContext = null;
-let masterGainNode = null;
 
-// 3. CATALOGUE DE PRESETS D'USINE
-const PRESETS = [
-  {
-    id: 'acid303',
-    title: 'Techno Acid 303',
-    desc: 'TR-909 percutante + basse 303 en dent de scie avec filtre dynamique',
-    code: `setcps(135/60/4)
+// Modèle de départ propre (sans presets imposés)
+const DEFAULT_CODE = `setcps(128/60/4)
 
 stack(
   // Batterie 909
-  s("bd [~ cp] bd [~ cp], hh*16?0.85").bank("RolandTR909").gain(1.1),
+  s("bd [~ cp] bd [~ cp]").bank("RolandTR909"),
+  s("hh*8 [oh hh]").gain(0.8),
   
-  // Basse Acid modulée par la macro LPF
-  note("c2 [~ c2] eb2 c2 [f2 c2] [g2 c2] bb1 [c2 c3]")
+  // Basse modulée par les macros en direct
+  note("c2 [~ c2] eb2 [~ f2] g2 [~ bb1] c2 ~")
     .s("sawtooth")
-    .decay(0.22)
-    .sustain(0.1)
     .lpf(macroLPF)
     .lpq(macroLPQ)
-    .distort(0.35)
-)`
-  },
-  {
-    id: 'jungle',
-    title: 'Jungle & DnB Break',
-    desc: 'Amen break découpé à 174 BPM + sub 808 et nappes chaudes',
-    code: `setcps(174/60/4)
+    .decay(0.3)
+    .sustain(0.1)
+)`;
 
-stack(
-  // Amen break tranché
-  s("amencutup").n("<0 [4 2] 3 [5 7]>").gain(1.2),
-  
-  // Sub 808
-  note("<[c1 ~] [~ eb1] [f1 ~] [g1 ~]>").s("sine").gain(1.4).decay(1.4),
-  
-  // Nappe de fond
-  note("<c4'min7 f4'min7 bb3'maj7 g3'dom7>")
-    .s("gm_pad_2_warm")
-    .slow(2)
-    .room(macroRoom)
-    .gain(0.65)
-)`
-  },
-  {
-    id: 'lofi',
-    title: 'Lo-Fi Chill Rhodes',
-    desc: 'Accords jazz au piano Rhodes, beat SP-1200 et vibraphone',
-    code: `setcps(84/60/4)
-
-stack(
-  // Texture vinyle
-  s("crackle").gain(0.12),
-  
-  // Beat feutré SP-1200
-  s("bd [~ bd] sd [~ bd], hh*4").bank("EmuSP1200").lpf(2200),
-  
-  // Accords de Rhodes
-  note("<[d3'm9] [g3'13] [c3'maj9] [a3'7b9]>")
-    .s("gm_electric_piano_1")
-    .slow(2)
-    .room(macroRoom)
-    .lpf(macroLPF),
-    
-  // Arpège subtil de vibraphone
-  note("a4 c5 e5 g5 a5").s("gm_vibraphone").degradeBy(0.4).delay(0.5)
-)`
-  },
-  {
-    id: 'synthwave',
-    title: 'Synthwave 80s',
-    desc: 'Batterie LinnDrum, basse roulante en 16e et lead néon spatial',
-    code: `setcps(110/60/4)
-
-stack(
-  // Batterie vintage 80s
-  s("bd [~ bd] [sd,cp] [~ bd], hh*8").bank("AkaiLinn"),
-  
-  // Basse 16e de note
-  note("c2*16").s("sawtooth").decay(0.15).lpf(macroLPF).lpq(4),
-  
-  // Lead spatial avec inversion stéréo (jux)
-  note("<c4 eb4 g4 bb4 c5 eb5>*2")
-    .s("gm_lead_2_sawtooth")
-    .jux(rev)
-    .delay(0.4)
-    .room(macroRoom)
-    .gain(0.75)
-)`
-  },
-  {
-    id: 'ambient',
-    title: 'Ambient Éthéré',
-    desc: 'Piano de concert polyrythmique et cordes symphoniques lentes',
-    code: `setcps(60/60/4)
-
-stack(
-  // Piano acoustique avec grand espace
-  note("c3 g3 eb4 bb4 f5")
-    .s("gm_acoustic_grand_piano")
-    .euclid(5, 12)
-    .room(macroRoom)
-    .size(0.9)
-    .delay(0.6)
-    .delaytime(0.5),
-    
-  // Nappe de cordes
-  note("<c3'sus2 f3'maj7 g3'sus4>")
-    .s("gm_string_ensemble_1")
-    .slow(4)
-    .attack(2)
-    .release(3)
-    .gain(0.7)
-)`
-  },
-  {
-    id: 'minimal',
-    title: 'Minimal Groovy',
-    desc: 'Percussions micro-glitch et basse sub sinusoïdale',
-    code: `setcps(126/60/4)
-
-stack(
-  s("bd(3,8), [~ cp](2,4), hh(9,16)").bank("RolandTR808"),
-  note("c2 ~ eb2 ~ g2 f2 ~ bb1").s("sine").gain(1.3).decay(0.35),
-  s("glitch*8?0.3").pan(sine.range(0.2, 0.8))
-)`
-  }
-];
-
-// 4. INITIALISATION DU MOTEUR STRUDEL HEADLESS
+// 3. INITIALISATION DU MOTEUR STRUDEL HEADLESS
 async function ensureEngine() {
   if (!repl) {
     updateStatus('Initialisation du moteur audio...', 'stopped');
@@ -152,7 +40,6 @@ async function ensureEngine() {
       prebake: () => samples('github:tidalcycles/dirt-samples')
     });
 
-    // Configuration de l'analyseur audio pour le visualiseur Canvas
     try {
       const webaudio = window.__strudel_webaudio || (repl && repl.webaudio);
       if (webaudio && webaudio.ctx) {
@@ -163,8 +50,7 @@ async function ensureEngine() {
 
       analyserNode = audioContext.createAnalyser();
       analyserNode.fftSize = 256;
-      
-      // Branchement si possible vers master
+
       if (webaudio && webaudio.master) {
         webaudio.master.connect(analyserNode);
       }
@@ -177,7 +63,7 @@ async function ensureEngine() {
   return repl;
 }
 
-// 5. FONCTIONS DE TRANSPORT
+// 4. TRANSPORT AUDIO (PLAY / STOP)
 async function play() {
   try {
     const engine = await ensureEngine();
@@ -186,34 +72,31 @@ async function play() {
     engine.evaluate(code);
     isPlaying = true;
 
-    // Mise à jour de l'UI
     const btnPlay = document.getElementById('btn-play');
     btnPlay.classList.add('playing');
-    document.getElementById('play-icon').textContent = '⚡';
     document.getElementById('play-text').textContent = 'ACTIF';
 
     updateStatus('En lecture (Cycles en cours)', 'playing');
     startMetro();
   } catch (err) {
     console.error('Erreur évaluation:', err);
-    updateStatus('Erreur syntaxe : ' + err.message, 'error');
+    updateStatus('Erreur de syntaxe : ' + err.message, 'error');
   }
 }
 
 function stop() {
   if (repl) {
     try {
-      repl.evaluate(''); // Passe silence pour couper
+      repl.evaluate('');
     } catch (e) {}
   }
   isPlaying = false;
 
   const btnPlay = document.getElementById('btn-play');
   btnPlay.classList.remove('playing');
-  document.getElementById('play-icon').textContent = '▶';
   document.getElementById('play-text').textContent = 'PLAY';
 
-  updateStatus('Arrêté', 'stopped');
+  updateStatus('Prêt (Arrêté)', 'stopped');
   stopMetro();
 }
 
@@ -224,7 +107,7 @@ function updateStatus(text, state) {
   textEl.textContent = text;
 }
 
-// 6. MÉTRONOME VISUEL (4 PULSATIONS DE TEMPS)
+// 5. MÉTRONOME VISUEL (4 TEMPS)
 function startMetro() {
   stopMetro();
   const beatIntervalMs = (60 / currentBpm) * 1000;
@@ -254,7 +137,7 @@ function stopMetro() {
   }
 }
 
-// 7. VISUALISEUR AUDIO CANVAS (Oscilloscope)
+// 6. VISUALISEUR AUDIO CANVAS (Oscilloscope)
 function startVisualizer() {
   const canvas = document.getElementById('oscilloscope');
   const ctx = canvas.getContext('2d');
@@ -267,16 +150,14 @@ function startVisualizer() {
     if (analyserNode && isPlaying) {
       analyserNode.getByteTimeDomainData(dataArray);
     } else {
-      // Onde de repos douce
       for (let i = 0; i < bufferLength; i++) {
         dataArray[i] = 128;
       }
     }
 
-    ctx.fillStyle = '#090a0f';
+    ctx.fillStyle = '#06070a';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Grille de fond
     ctx.strokeStyle = '#141824';
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -284,9 +165,8 @@ function startVisualizer() {
     ctx.lineTo(canvas.width, canvas.height / 2);
     ctx.stroke();
 
-    // Dessin de la forme d'onde
     ctx.lineWidth = 2;
-    ctx.strokeStyle = isPlaying ? '#10b981' : '#374151';
+    ctx.strokeStyle = isPlaying ? '#10b981' : '#334155';
     ctx.beginPath();
 
     const sliceWidth = (canvas.width * 1.0) / bufferLength;
@@ -311,40 +191,99 @@ function startVisualizer() {
   draw();
 }
 
-// 8. INITIALISATION DES CONTRÔLES & ÉVÉNEMENTS
+// 7. GESTION DES MISES À JOUR
+async function checkUpdates(silent = false) {
+  const btnUpdate = document.getElementById('btn-update');
+  const updateIcon = document.getElementById('update-icon');
+  const updateLabel = document.getElementById('update-label');
+  const updateDot = document.getElementById('update-dot');
+
+  if (!window.desktopApi || !window.desktopApi.checkForUpdates) {
+    if (!silent) alert('Vérification des mises à jour disponible dans l\'application desktop.');
+    return;
+  }
+
+  try {
+    updateLabel.textContent = 'Vérification...';
+    updateIcon.style.animation = 'spin 1s linear infinite';
+
+    const res = await window.desktopApi.checkForUpdates();
+
+    updateIcon.style.animation = '';
+    updateLabel.textContent = 'Mises à jour';
+
+    if (res && res.hasUpdate) {
+      btnUpdate.classList.add('has-update');
+      updateDot.style.display = 'inline-block';
+      openUpdateModal(res);
+    } else {
+      btnUpdate.classList.remove('has-update');
+      updateDot.style.display = 'none';
+      if (!silent) {
+        alert('Votre version de Strudel Studio est parfaitement à jour (' + (res.currentVersion || 'Dernier commit') + ').');
+      }
+    }
+  } catch (err) {
+    console.warn('Erreur vérification maj:', err);
+    updateIcon.style.animation = '';
+    updateLabel.textContent = 'Mises à jour';
+    if (!silent) alert('Impossible de vérifier les mises à jour pour le moment.');
+  }
+}
+
+function openUpdateModal(updateInfo) {
+  const modal = document.getElementById('update-modal');
+  const title = document.getElementById('modal-update-title');
+  const msg = document.getElementById('modal-update-msg');
+  const changelog = document.getElementById('modal-changelog');
+
+  title.textContent = 'Mise à jour disponible (' + updateInfo.latestVersion + ')';
+  msg.textContent = `Votre version actuelle est ${updateInfo.currentVersion}. Une version plus récente est disponible sur la branche app.`;
+  changelog.textContent = updateInfo.changelog || 'Mise à jour des composants et améliorations diverses.';
+
+  modal.classList.add('open');
+}
+
+function closeUpdateModal() {
+  document.getElementById('update-modal').classList.remove('open');
+}
+
+async function triggerInstallUpdate() {
+  const btn = document.getElementById('btn-confirm-install');
+  const label = document.getElementById('btn-install-label');
+
+  btn.disabled = true;
+  label.textContent = 'Téléchargement & Installation...';
+
+  try {
+    const res = await window.desktopApi.installUpdate();
+    if (res && res.success) {
+      label.textContent = 'Redémarrage en cours...';
+      setTimeout(() => {
+        window.desktopApi.restartApp();
+      }, 1000);
+    } else {
+      alert('Erreur lors de l\'installation : ' + (res.error || 'Erreur inconnue'));
+      btn.disabled = false;
+      label.textContent = 'Réessayer';
+    }
+  } catch (err) {
+    alert('Erreur lors de la mise à jour : ' + err.message);
+    btn.disabled = false;
+    label.textContent = 'Réessayer';
+  }
+}
+
+// 8. INITIALISATION DES CONTRÔLES
 document.addEventListener('DOMContentLoaded', () => {
   const editor = document.getElementById('code-editor');
-  const presetList = document.getElementById('preset-list');
 
-  // Génération des presets dans la sidebar
-  PRESETS.forEach((preset, index) => {
-    const item = document.createElement('div');
-    item.className = 'preset-item' + (index === 0 ? ' active' : '');
-    item.innerHTML = `
-      <div class="preset-title">${preset.title}</div>
-      <div class="preset-desc">${preset.desc}</div>
-    `;
-    item.onclick = () => {
-      document.querySelectorAll('.preset-item').forEach(el => el.classList.remove('active'));
-      item.classList.add('active');
-      editor.value = preset.code;
-      document.getElementById('current-filename').textContent = preset.id + '.strudel';
-      if (isPlaying) play(); // Réévalue à la volée !
-    };
-    presetList.appendChild(item);
-  });
-
-  // Chargement du premier preset
-  editor.value = PRESETS[0].code;
+  // Code par défaut
+  editor.value = DEFAULT_CODE;
 
   // Boutons Play / Stop
   document.getElementById('btn-play').onclick = () => {
-    if (isPlaying) {
-      // Re-évaluer sans couper
-      play();
-    } else {
-      play();
-    }
+    play();
   };
 
   document.getElementById('btn-stop').onclick = stop;
@@ -355,7 +294,6 @@ document.addEventListener('DOMContentLoaded', () => {
     currentBpm = parseInt(e.target.value) || 128;
     if (isPlaying) {
       startMetro();
-      // Injecte le tempo si spécifié
       repl && repl.evaluate(`setcps(${currentBpm}/60/4)`);
     }
   };
@@ -400,7 +338,6 @@ document.addEventListener('DOMContentLoaded', () => {
     slider.oninput = (e) => {
       window[varName] = parseFloat(e.target.value);
       label.textContent = e.target.value + unit;
-      // Note : les patterns référençant `macroLPF` liront la nouvelle valeur à la volée !
     };
   };
 
@@ -409,7 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupMacro('slider-macroRoom', 'macroRoom', 'val-macroRoom');
   setupMacro('slider-masterVolume', 'masterGainValue', 'val-masterVolume', '%');
 
-  // Insertion de snippets
+  // Insertion de snippets au curseur
   document.querySelectorAll('.btn-snippet').forEach(btn => {
     btn.onclick = () => {
       const snippet = btn.getAttribute('data-code');
@@ -417,6 +354,18 @@ document.addEventListener('DOMContentLoaded', () => {
       const end = editor.selectionEnd;
       const text = editor.value;
       editor.value = text.substring(0, start) + '\n  ' + snippet + text.substring(end);
+      editor.focus();
+    };
+  });
+
+  // Insertion de tags sonores
+  document.querySelectorAll('.sound-tag').forEach(tag => {
+    tag.onclick = () => {
+      const textToInsert = tag.getAttribute('data-insert');
+      const start = editor.selectionStart;
+      const end = editor.selectionEnd;
+      const text = editor.value;
+      editor.value = text.substring(0, start) + textToInsert + text.substring(end);
       editor.focus();
     };
   });
@@ -431,13 +380,17 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       stop();
     }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+      e.preventDefault();
+      document.getElementById('btn-save').click();
+    }
   });
 
-  // Actions de fichiers (Electron Desktop API)
+  // Fichiers (Electron Desktop API)
   document.getElementById('btn-new').onclick = () => {
-    if (confirm('Créer un nouveau fichier vide ?')) {
+    if (confirm('Créer un nouveau fichier ?')) {
       editor.value = `setcps(128/60/4)\n\ns("bd*4")`;
-      document.getElementById('current-filename').textContent = 'sans_titre.strudel';
+      document.getElementById('current-filename').textContent = 'nouveau.strudel';
     }
   };
 
@@ -449,8 +402,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('current-filename').textContent = res.filename;
         if (isPlaying) play();
       }
-    } else {
-      alert('Fonction disponible dans l\'application desktop.');
     }
   };
 
@@ -463,10 +414,18 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       if (res) {
         document.getElementById('current-filename').textContent = res.filename;
-        alert('Fichier sauvegardé avec succès !');
       }
-    } else {
-      alert('Fonction disponible dans l\'application desktop.');
     }
   };
+
+  // Mises à jour
+  document.getElementById('btn-update').onclick = () => checkUpdates(false);
+  document.getElementById('btn-close-modal').onclick = closeUpdateModal;
+  document.getElementById('btn-cancel-update').onclick = closeUpdateModal;
+  document.getElementById('btn-confirm-install').onclick = triggerInstallUpdate;
+
+  // Vérification silencieuse au démarrage
+  setTimeout(() => {
+    checkUpdates(true);
+  }, 3000);
 });
