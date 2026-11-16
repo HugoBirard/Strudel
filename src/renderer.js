@@ -1,4 +1,4 @@
-import { initStrudel, getAudioContext } from '../node_modules/@strudel/web/dist/index.mjs';
+import { initStrudel, getAudioContext, samples } from '../node_modules/@strudel/web/dist/index.mjs';
 
 // 1. MACROS GLOBALES (Modifiables en direct par les sliders)
 window.macroLPF = 1200;
@@ -25,20 +25,17 @@ function setupGlobalAudioInterceptor() {
 
   const originalConnect = AudioNode.prototype.connect;
   AudioNode.prototype.connect = function(dest, ...args) {
-    try {
-      if (analyserNode && this !== analyserNode) {
+    if (analyserNode && this !== analyserNode && this.context === analyserNode.context) {
+      try {
         const isDestination = (dest instanceof AudioDestinationNode) ||
-          (dest && dest.numberOfOutputs === 0 && dest.maxChannelCount !== undefined) ||
-          (dest && dest.constructor && dest.constructor.name === 'AudioDestinationNode') ||
-          (dest && dest.constructor && dest.constructor.name === 'ChannelMergerNode') ||
-          (dest && dest.constructor && dest.constructor.name === 'GainNode' && dest.channelCountMode);
+          (dest && dest.constructor && dest.constructor.name === 'AudioDestinationNode');
 
         if (isDestination) {
           originalConnect.call(this, analyserNode);
         }
+      } catch (e) {
+        // Ne jamais altérer la connexion d'origine
       }
-    } catch (e) {
-      // Ignorer silencieusement
     }
     return originalConnect.call(this, dest, ...args);
   };
@@ -230,9 +227,18 @@ function escapeHtml(text) {
 async function ensureEngine() {
   if (!repl) {
     updateStatus('Initialisation du moteur audio...', 'stopped');
-    repl = await initStrudel({
-      prebake: () => samples('github:tidalcycles/dirt-samples')
-    });
+    repl = await initStrudel();
+
+    // Chargement non-bloquant des samples distants (n'empêche pas les synthés locaux de jouer)
+    try {
+      if (typeof samples === 'function') {
+        samples('github:tidalcycles/dirt-samples').catch(err => {
+          console.warn('[Strudel] Info: Samples distants non accessibles (mode hors-ligne ou réseau restreint):', err.message);
+        });
+      }
+    } catch (e) {
+      // Ignorer si indisponible
+    }
 
     try {
       if (typeof getAudioContext === 'function') {
@@ -267,12 +273,13 @@ async function play() {
 
     const engine = await ensureEngine();
     
-    // Débloque l'audioContext si suspendu
-    if (audioContext && audioContext.state === 'suspended') {
-      await audioContext.resume();
+    // Débloque l'audioContext si suspendu (politique d'autoplay du navigateur/Electron)
+    const ctx = audioContext || (typeof getAudioContext === 'function' ? getAudioContext() : null);
+    if (ctx && ctx.state === 'suspended') {
+      await ctx.resume();
     }
 
-    engine.evaluate(code);
+    await engine.evaluate(code);
     isPlaying = true;
 
     const btnPlay = document.getElementById('btn-play');
@@ -290,8 +297,14 @@ async function play() {
 function stop() {
   if (repl) {
     try {
-      repl.evaluate('');
-    } catch (e) {}
+      if (typeof repl.stop === 'function') {
+        repl.stop();
+      } else {
+        repl.evaluate('');
+      }
+    } catch (e) {
+      console.warn('Erreur stop repl:', e);
+    }
   }
   isPlaying = false;
 
@@ -535,7 +548,8 @@ async function triggerInstallUpdate() {
 }
 
 // 11. INITIALISATION DES CONTRÔLES AU CHARGEMENT DU DOM
-document.addEventListener('DOMContentLoaded', () => {
+function initApp() {
+  console.log('[Renderer]: initApp starting...');
   const editor = document.getElementById('code-editor');
 
   // Charge le thème et démarre le visualiseur
@@ -711,4 +725,20 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     checkUpdates(true);
   }, 3000);
-});
+
+  // Pré-initialisation propre du moteur Strudel au lancement
+  setTimeout(async () => {
+    try {
+      await ensureEngine();
+      console.log('[Strudel Studio] Moteur audio initialisé et prêt.');
+    } catch (e) {
+      console.warn('[Strudel Studio] Initialisation reportée au premier clic:', e);
+    }
+  }, 500);
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}

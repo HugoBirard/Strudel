@@ -20,7 +20,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
       contextIsolation: true,
-      webSecurity: true, // Sécurité Web activée
+      webSecurity: false, // Nécessaire pour WebAudio AudioWorklet (data: URI) et CORS sur samples distants
       sandbox: false
     }
   });
@@ -41,6 +41,11 @@ function createWindow() {
   });
 
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
+
+  // Affiche les logs du renderer dans le terminal pour déboguer
+  mainWindow.webContents.on('console-message', (event, level, message, line, sourceId) => {
+    console.log(`[Renderer]: ${message} (line ${line})`);
+  });
 
   mainWindow.on('closed', () => {
     mainWindow = null;
