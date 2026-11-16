@@ -1,0 +1,27 @@
+{
+  "name": "strudel-studio",
+  "version": "1.0.0",
+  "description": "Desktop Live-Coding Studio utilisant le moteur Strudel avec interface 100% sur-mesure",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "install-shortcut": "bash scripts/install-shortcut.sh"
+  },
+  "keywords": [
+    "strudel",
+    "tidalcycles",
+    "live-coding",
+    "desktop",
+    "electron",
+    "webaudio"
+  ],
+  "author": "Hugo Birard",
+  "license": "AGPL-3.0",
+  "dependencies": {
+    "@strudel/web": "^1.3.0"
+  },
+  "devDependencies": {
+    "electron": "^40.0.0"
+  }
+}

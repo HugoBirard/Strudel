@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Strudel Studio</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- 1. TOP TRANSPORT BAR -->
+  <header class="transport-bar">
+    <!-- Brand -->
+    <div class="brand">
+      <div class="brand-logo">
+        <svg class="svg-icon" viewBox="0 0 24 24">
+          <path d="M2 12h3l2-7 4 14 4-10 2 6h5" />
+        </svg>
+      </div>
+      <span class="brand-title">STRUDEL STUDIO</span>
+      <span class="brand-badge">Desktop</span>
+    </div>
+
+    <!-- Transport Controls -->
+    <div class="transport-controls">
+      <!-- Play Button -->
+      <button id="btn-play" class="btn-play" title="Jouer (Ctrl + Entrée)">
+        <svg id="play-icon" class="svg-icon filled" viewBox="0 0 24 24">
+          <polygon points="6 3 20 12 6 21 6 3" />
+        </svg>
+        <span id="play-text">PLAY</span>
+      </button>
+
+      <!-- Stop Button -->
+      <button id="btn-stop" class="btn-stop" title="Arrêter tout (Ctrl + .)">
+        <svg class="svg-icon filled" viewBox="0 0 24 24">
+          <rect x="5" y="5" width="14" height="14" rx="2" />
+        </svg>
+        <span>STOP</span>
+      </button>
+
+      <!-- Metro Beats Indicators -->
+      <div class="metro-box" title="Pulsations du cycle">
+        <div class="metro-dot downbeat" id="dot-0"></div>
+        <div class="metro-dot" id="dot-1"></div>
+        <div class="metro-dot" id="dot-2"></div>
+        <div class="metro-dot" id="dot-3"></div>
+      </div>
+
+      <!-- Tempo Controller -->
+      <div class="tempo-box">
+        <span style="font-size: 11px; font-weight: 700; color: #64748b;">BPM</span>
+        <input type="number" id="tempo-input" class="tempo-input" value="128" min="30" max="300">
+        <button id="tempo-minus" class="tempo-btn" title="Diminuer BPM">−</button>
+        <button id="tempo-plus" class="tempo-btn" title="Augmenter BPM">+</button>
+        <button id="btn-tap" class="tempo-btn" style="width: auto; padding: 0 6px; font-size: 10px;" title="Taper le tempo">TAP</button>
+      </div>
+    </div>
+
+    <!-- Top Right Actions -->
+    <div class="top-actions">
+      <!-- New File -->
+      <button id="btn-new" class="btn-action" title="Nouveau projet">
+        <svg class="svg-icon" viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <polyline points="14 2 14 8 20 8" />
+          <line x1="12" y1="18" x2="12" y2="12" />
+          <line x1="9" y1="15" x2="15" y2="15" />
+        </svg>
+        <span>Nouveau</span>
+      </button>
+
+      <!-- Open File -->
+      <button id="btn-open" class="btn-action" title="Ouvrir un fichier .strudel">
+        <svg class="svg-icon" viewBox="0 0 24 24">
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+        </svg>
+        <span>Ouvrir</span>
+      </button>
+
+      <!-- Save File -->
+      <button id="btn-save" class="btn-action" title="Sauvegarder (Ctrl + S)">
+        <svg class="svg-icon" viewBox="0 0 24 24">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+          <polyline points="17 21 17 13 7 13 7 21" />
+          <polyline points="7 3 7 8 15 8" />
+        </svg>
+        <span>Sauvegarder</span>
+      </button>
+
+      <!-- Update Checker Button -->
+      <button id="btn-update" class="btn-update" title="Rechercher des mises à jour">
+        <svg id="update-icon" class="svg-icon" viewBox="0 0 24 24">
+          <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+        </svg>
+        <span id="update-label">Mises à jour</span>
+        <span class="update-badge-dot" id="update-dot"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 2. MAIN 3-PANEL WORKSPACE -->
+  <main class="main-workspace">
+
+    <!-- LEFT SIDEBAR : USER SNIPPETS & SAVED LINES -->
+    <aside class="sidebar-left">
+      <!-- Section Header -->
+      <div class="panel-header">
+        <span>Mes Snippets & Lignes</span>
+        <button id="btn-add-snippet" class="btn-snippet-icon" title="Créer un nouveau snippet manuellement">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Action Button : Save selected line in editor -->
+      <div class="snippet-actions-bar">
+        <button id="btn-save-selection" class="btn-save-selection" title="Sélectionnez une ligne dans l'éditeur et cliquez ici pour l'enregistrer">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+            <polyline points="17 21 17 13 7 13 7 21" />
+            <polyline points="7 3 7 8 15 8" />
+          </svg>
+          <span>Sauvegarder la sélection</span>
+        </button>
+      </div>
+
+      <!-- Snippets List Container -->
+      <div id="user-snippets-container" class="user-snippets-container">
+        <!-- Rempli dynamiquement par JS -->
+      </div>
+    </aside>
+
+    <!-- CENTER PANEL : CODE EDITOR -->
+    <section class="center-editor-container">
+      <div class="editor-header">
+        <div class="file-tab">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="color: #6366f1;">
+            <polyline points="16 18 22 12 16 6" />
+            <polyline points="8 6 2 12 8 18" />
+          </svg>
+          <span id="current-filename">mon_morceau.strudel</span>
+        </div>
+        <div style="font-size: 11px; color: #64748b;">
+          <kbd style="background: #181c2c; padding: 2px 5px; border-radius: 4px; border: 1px solid #282f49;">Ctrl + Entrée</kbd> pour Évaluer
+        </div>
+      </div>
+
+      <div class="editor-wrapper">
+        <textarea id="code-editor" spellcheck="false" placeholder="// Écrivez votre code Strudel ici..."></textarea>
+      </div>
+
+      <div class="editor-status-bar">
+        <div id="status-indicator" class="status-badge stopped">
+          <span style="font-size: 14px;">●</span>
+          <span id="status-text">Prêt (Arrêté)</span>
+        </div>
+        <div style="color: #64748b; font-size: 11px;">
+          Moteur : WebAudio Headless Superdough
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT SIDEBAR : VISUALIZER & MACROS -->
+    <aside class="sidebar-right">
+      <!-- Real-time Oscilloscope -->
+      <div class="visualizer-card">
+        <div class="panel-header" style="padding: 0 0 6px 0; border: none;">
+          <span>Visualiseur Audio</span>
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; color: #10b981;">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+          </svg>
+        </div>
+        <canvas id="oscilloscope" width="260" height="110"></canvas>
+      </div>
+
+      <!-- Macro Controls -->
+      <div class="macros-card">
+        <div class="panel-header" style="padding: 0 0 4px 0; border: none;">
+          <span>Macros en Direct</span>
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
+        </div>
+
+        <!-- Macro 1 : Cutoff -->
+        <div class="macro-control">
+          <div class="macro-label">
+            <span>Cutoff Filtre (macroLPF)</span>
+            <span id="val-macroLPF">1200 Hz</span>
+          </div>
+          <input type="range" id="slider-macroLPF" class="macro-slider" min="100" max="6000" value="1200">
+        </div>
+
+        <!-- Macro 2 : Resonance -->
+        <div class="macro-control">
+          <div class="macro-label">
+            <span>Résonance (macroLPQ)</span>
+            <span id="val-macroLPQ">6.0</span>
+          </div>
+          <input type="range" id="slider-macroLPQ" class="macro-slider" min="0.5" max="18" step="0.5" value="6">
+        </div>
+
+        <!-- Macro 3 : Room -->
+        <div class="macro-control">
+          <div class="macro-label">
+            <span>Reverb (macroRoom)</span>
+            <span id="val-macroRoom">0.50</span>
+          </div>
+          <input type="range" id="slider-macroRoom" class="macro-slider" min="0" max="1" step="0.05" value="0.5">
+        </div>
+
+        <!-- Macro 4 : Master Volume -->
+        <div class="macro-control">
+          <div class="macro-label">
+            <span>Volume Général</span>
+            <span id="val-masterVolume">85%</span>
+          </div>
+          <input type="range" id="slider-masterVolume" class="macro-slider" min="0" max="1" step="0.01" value="0.85">
+        </div>
+      </div>
+    </aside>
+
+  </main>
+
+  <!-- 3. MODAL DE CRÉATION DE SNIPPET -->
+  <div id="snippet-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="color: #6366f1;">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+            <polyline points="17 21 17 13 7 13 7 21" />
+            <polyline points="7 3 7 8 15 8" />
+          </svg>
+          <span id="modal-snippet-title">Enregistrer un Snippet</span>
+        </div>
+        <button id="btn-close-snippet-modal" class="tempo-btn" style="width: 24px; height: 24px;">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <label style="font-size: 11px; font-weight: 600; text-transform: uppercase;">Titre / Nom du Snippet :</label>
+        <input type="text" id="input-snippet-name" class="modal-input" placeholder="ex: Mon Beat Favori, Ma Basse Acid, Nappe..." />
+
+        <label style="font-size: 11px; font-weight: 600; text-transform: uppercase; margin-top: 4px;">Code / Ligne(s) Strudel :</label>
+        <textarea id="input-snippet-code" class="modal-textarea" placeholder="s(&quot;bd [~ cp]&quot;)"></textarea>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btn-cancel-snippet" class="btn-action">Annuler</button>
+        <button id="btn-confirm-save-snippet" class="btn-play" style="padding: 7px 16px;">
+          <span>Enregistrer</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. MODAL DE MISE À JOUR -->
+  <div id="update-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="color: #6366f1;">
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+          </svg>
+          <span id="modal-update-title">Mise à jour disponible</span>
+        </div>
+        <button id="btn-close-modal" class="tempo-btn" style="width: 24px; height: 24px;">✕</button>
+      </div>
+
+      <div class="modal-body" id="modal-update-body">
+        <p id="modal-update-msg">Une nouvelle version de Strudel Studio est disponible sur le dépôt.</p>
+        <div style="margin: 10px 0 4px 0; font-size: 11px; font-weight: 600;">Détails des modifications :</div>
+        <div class="changelog-box" id="modal-changelog">Vérification...</div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btn-cancel-update" class="btn-action">Fermer</button>
+        <button id="btn-confirm-install" class="btn-play" style="padding: 7px 16px;">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          <span id="btn-install-label">Installer et Redémarrer</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="renderer.js"></script>
+</body>
+</html>
