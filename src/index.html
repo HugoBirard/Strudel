@@ -101,105 +101,34 @@
   <!-- 2. MAIN 3-PANEL WORKSPACE -->
   <main class="main-workspace">
 
-    <!-- LEFT SIDEBAR : QUICK SNIPPETS & SOUND EXPLORER -->
+    <!-- LEFT SIDEBAR : USER SNIPPETS & SAVED LINES -->
     <aside class="sidebar-left">
-      <!-- Section 1 : Quick Snippets -->
+      <!-- Section Header -->
       <div class="panel-header">
-        <span>Générateur & Snippets</span>
-        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;">
-          <polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-        </svg>
-      </div>
-
-      <div class="panel-section">
-        <div class="section-subtitle">
-          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px;">
-            <circle cx="12" cy="12" r="10" />
-            <polygon points="10 8 16 12 10 16 10 8" />
+        <span>Mes Snippets & Lignes</span>
+        <button id="btn-add-snippet" class="btn-snippet-icon" title="Créer un nouveau snippet manuellement">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
-          <span>Pistes Rythmiques :</span>
-        </div>
-        <div class="snippet-grid">
-          <button class="btn-snippet" data-code='s("bd [~ cp] bd [~ cp]").bank("RolandTR909")'>
-            <span>Beat 909</span>
-          </button>
-          <button class="btn-snippet" data-code='s("bd(3,8), [~ cp](2,4)").bank("RolandTR808")'>
-            <span>Beat 808</span>
-          </button>
-          <button class="btn-snippet" data-code='s("hh*8 [oh hh]").gain(0.8)'>
-            <span>Hats 16th</span>
-          </button>
-          <button class="btn-snippet" data-code='s("amencutup").n("<0 [4 2] 3 [5 7]>").gain(1.2)'>
-            <span>Amen Slice</span>
-          </button>
-        </div>
+        </button>
+      </div>
 
-        <div class="section-subtitle" style="margin-top: 6px;">
-          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px;">
-            <path d="M9 18V5l12-2v13" />
-            <circle cx="6" cy="18" r="3" />
-            <circle cx="18" cy="16" r="3" />
+      <!-- Action Button : Save selected line in editor -->
+      <div class="snippet-actions-bar">
+        <button id="btn-save-selection" class="btn-save-selection" title="Sélectionnez une ligne dans l'éditeur et cliquez ici pour l'enregistrer">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+            <polyline points="17 21 17 13 7 13 7 21" />
+            <polyline points="7 3 7 8 15 8" />
           </svg>
-          <span>Lignes de Basse & Synthés :</span>
-        </div>
-        <div class="snippet-grid">
-          <button class="btn-snippet" data-code='note("c2 [~ c2] eb2 f2").s("sawtooth").lpf(macroLPF).lpq(macroLPQ)'>
-            <span>Acid 303</span>
-          </button>
-          <button class="btn-snippet" data-code='note("<[c1 ~] [~ eb1] [f1 ~] [g1 ~]>").s("sine").gain(1.4)'>
-            <span>Sub Bass</span>
-          </button>
-          <button class="btn-snippet" data-code='note("<[c3&apos;m7] [ab2&apos;maj7] [eb3&apos;maj7]>").s("gm_electric_piano_1").room(macroRoom)'>
-            <span>Rhodes Jazz</span>
-          </button>
-          <button class="btn-snippet" data-code='note("<c4&apos;m7 ab3&apos;maj7>").arp("updown").s("gm_vibraphone").delay(0.4)'>
-            <span>Arpège Vibra</span>
-          </button>
-        </div>
+          <span>Sauvegarder la sélection</span>
+        </button>
       </div>
 
-      <!-- Section 2 : Sound Explorer -->
-      <div class="panel-header">
-        <span>Explorateur d'Instruments</span>
-        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;">
-          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-        </svg>
-      </div>
-
-      <div class="panel-section">
-        <div class="section-subtitle">Boîtes à Rythmes (.bank) :</div>
-        <div class="sound-tag-grid">
-          <span class="sound-tag" data-insert='.bank("RolandTR909")'>RolandTR909</span>
-          <span class="sound-tag" data-insert='.bank("RolandTR808")'>RolandTR808</span>
-          <span class="sound-tag" data-insert='.bank("AkaiLinn")'>AkaiLinn</span>
-          <span class="sound-tag" data-insert='.bank("EmuSP1200")'>EmuSP1200</span>
-          <span class="sound-tag" data-insert='.bank("OberheimDMX")'>OberheimDMX</span>
-          <span class="sound-tag" data-insert='.bank("RolandTR707")'>RolandTR707</span>
-        </div>
-
-        <div class="section-subtitle" style="margin-top: 8px;">Soundfonts General MIDI :</div>
-        <div class="sound-tag-grid">
-          <span class="sound-tag" data-insert='.s("gm_piano")'>gm_piano</span>
-          <span class="sound-tag" data-insert='.s("gm_electric_piano_1")'>gm_epiano1</span>
-          <span class="sound-tag" data-insert='.s("gm_vibraphone")'>gm_vibraphone</span>
-          <span class="sound-tag" data-insert='.s("gm_string_ensemble_1")'>gm_strings</span>
-          <span class="sound-tag" data-insert='.s("gm_synth_bass_1")'>gm_synth_bass</span>
-          <span class="sound-tag" data-insert='.s("gm_lead_2_sawtooth")'>gm_lead_saw</span>
-          <span class="sound-tag" data-insert='.s("gm_pad_2_warm")'>gm_pad_warm</span>
-          <span class="sound-tag" data-insert='.s("gm_sitar")'>gm_sitar</span>
-          <span class="sound-tag" data-insert='.s("gm_choir_aahs")'>gm_choir</span>
-        </div>
-
-        <div class="section-subtitle" style="margin-top: 8px;">Synthés & Bruits Superdough :</div>
-        <div class="sound-tag-grid">
-          <span class="sound-tag" data-insert='.s("sawtooth")'>sawtooth</span>
-          <span class="sound-tag" data-insert='.s("square")'>square</span>
-          <span class="sound-tag" data-insert='.s("sine")'>sine</span>
-          <span class="sound-tag" data-insert='.s("triangle")'>triangle</span>
-          <span class="sound-tag" data-insert='.s("white")'>white</span>
-          <span class="sound-tag" data-insert='.s("crackle")'>crackle</span>
-        </div>
+      <!-- Snippets List Container -->
+      <div id="user-snippets-container" class="user-snippets-container">
+        <!-- Rempli dynamiquement par JS -->
       </div>
     </aside>
 
@@ -243,7 +172,7 @@
             <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
           </svg>
         </div>
-        <canvas id="oscilloscope" width="280" height="110"></canvas>
+        <canvas id="oscilloscope" width="260" height="110"></canvas>
       </div>
 
       <!-- Macro Controls -->
@@ -296,7 +225,39 @@
 
   </main>
 
-  <!-- 3. MODAL DE MISE À JOUR -->
+  <!-- 3. MODAL DE CRÉATION DE SNIPPET -->
+  <div id="snippet-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="color: #6366f1;">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+            <polyline points="17 21 17 13 7 13 7 21" />
+            <polyline points="7 3 7 8 15 8" />
+          </svg>
+          <span id="modal-snippet-title">Enregistrer un Snippet</span>
+        </div>
+        <button id="btn-close-snippet-modal" class="tempo-btn" style="width: 24px; height: 24px;">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <label style="font-size: 11px; font-weight: 600; text-transform: uppercase;">Titre / Nom du Snippet :</label>
+        <input type="text" id="input-snippet-name" class="modal-input" placeholder="ex: Mon Beat Favori, Ma Basse Acid, Nappe..." />
+
+        <label style="font-size: 11px; font-weight: 600; text-transform: uppercase; margin-top: 4px;">Code / Ligne(s) Strudel :</label>
+        <textarea id="input-snippet-code" class="modal-textarea" placeholder="s(&quot;bd [~ cp]&quot;)"></textarea>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btn-cancel-snippet" class="btn-action">Annuler</button>
+        <button id="btn-confirm-save-snippet" class="btn-play" style="padding: 7px 16px;">
+          <span>Enregistrer</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. MODAL DE MISE À JOUR -->
   <div id="update-modal" class="modal-overlay">
     <div class="modal-card">
       <div class="modal-header">

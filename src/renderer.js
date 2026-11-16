@@ -15,24 +15,167 @@ let currentBeat = 0;
 let analyserNode = null;
 let audioContext = null;
 
-// Modèle de départ propre (sans presets imposés)
-const DEFAULT_CODE = `setcps(128/60/4)
+// L'éditeur commence vierge (aucun code pré-fait)
+const DEFAULT_CODE = "";
 
-stack(
-  // Batterie 909
-  s("bd [~ cp] bd [~ cp]").bank("RolandTR909"),
-  s("hh*8 [oh hh]").gain(0.8),
-  
-  // Basse modulée par les macros en direct
-  note("c2 [~ c2] eb2 [~ f2] g2 [~ bb1] c2 ~")
-    .s("sawtooth")
-    .lpf(macroLPF)
-    .lpq(macroLPQ)
-    .decay(0.3)
-    .sustain(0.1)
-)`;
+// 3. GESTION DES SNIPPETS PERSONNALISÉS DE L'UTILISATEUR
+const SNIPPETS_STORAGE_KEY = 'strudel_user_snippets';
 
-// 3. INITIALISATION DU MOTEUR STRUDEL HEADLESS
+function getUserSnippets() {
+  try {
+    const raw = localStorage.getItem(SNIPPETS_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    console.warn('Erreur lecture snippets:', e);
+    return [];
+  }
+}
+
+function saveUserSnippets(snippets) {
+  try {
+    localStorage.setItem(SNIPPETS_STORAGE_KEY, JSON.stringify(snippets));
+  } catch (e) {
+    console.error('Erreur sauvegarde snippets:', e);
+  }
+}
+
+function renderUserSnippets() {
+  const container = document.getElementById('user-snippets-container');
+  const snippets = getUserSnippets();
+
+  container.innerHTML = '';
+
+  if (snippets.length === 0) {
+    container.innerHTML = `
+      <div class="empty-snippets-msg">
+        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 28px; height: 28px; color: #475569; margin-bottom: 8px;">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+        </svg>
+        <p><strong>Aucun snippet enregistré.</strong></p>
+        <p style="margin-top: 4px; font-size: 11px;">Écrivez du code, sélectionnez vos lignes préférées et cliquez sur <em>Sauvegarder la sélection</em> pour les réutiliser quand vous voulez.</p>
+      </div>
+    `;
+    return;
+  }
+
+  snippets.forEach(snippet => {
+    const card = document.createElement('div');
+    card.className = 'user-snippet-card';
+    card.innerHTML = `
+      <div class="snippet-card-top">
+        <span class="snippet-card-title">${escapeHtml(snippet.title || 'Snippet sans titre')}</span>
+        <div class="snippet-card-actions">
+          <button class="btn-snippet-icon delete" title="Supprimer ce snippet" data-action="delete" data-id="${snippet.id}">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px;">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="snippet-card-preview" title="Cliquer pour insérer au curseur" data-action="insert" data-id="${snippet.id}">${escapeHtml(snippet.code)}</div>
+      <button class="btn-insert-snippet" data-action="insert" data-id="${snippet.id}">
+        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span>Insérer au curseur</span>
+      </button>
+    `;
+
+    // Événements d'insertion et suppression
+    card.querySelectorAll('[data-action="insert"]').forEach(el => {
+      el.onclick = () => insertSnippetIntoEditor(snippet.code);
+    });
+
+    card.querySelector('[data-action="delete"]').onclick = (e) => {
+      e.stopPropagation();
+      deleteUserSnippet(snippet.id);
+    };
+
+    container.appendChild(card);
+  });
+}
+
+function insertSnippetIntoEditor(code) {
+  const editor = document.getElementById('code-editor');
+  const start = editor.selectionStart;
+  const end = editor.selectionEnd;
+  const currentText = editor.value;
+
+  // Si l'éditeur est vide, on remplace simplement
+  if (!currentText.trim()) {
+    editor.value = code;
+    editor.focus();
+    return;
+  }
+
+  // Sinon on insère au curseur
+  const prefix = (start > 0 && currentText[start - 1] !== '\n') ? '\n' : '';
+  const suffix = (end < currentText.length && currentText[end] !== '\n') ? '\n' : '';
+  editor.value = currentText.substring(0, start) + prefix + code + suffix + currentText.substring(end);
+
+  editor.focus();
+  const newPos = start + prefix.length + code.length;
+  editor.setSelectionRange(newPos, newPos);
+}
+
+function deleteUserSnippet(id) {
+  if (confirm('Voulez-vous supprimer ce snippet ?')) {
+    const list = getUserSnippets().filter(s => s.id !== id);
+    saveUserSnippets(list);
+    renderUserSnippets();
+  }
+}
+
+function openSaveSnippetModal(prefilledCode = '') {
+  const modal = document.getElementById('snippet-modal');
+  const nameInput = document.getElementById('input-snippet-name');
+  const codeInput = document.getElementById('input-snippet-code');
+
+  nameInput.value = '';
+  codeInput.value = prefilledCode;
+
+  modal.classList.add('open');
+  nameInput.focus();
+}
+
+function closeSaveSnippetModal() {
+  document.getElementById('snippet-modal').classList.remove('open');
+}
+
+function confirmSaveSnippet() {
+  const nameInput = document.getElementById('input-snippet-name');
+  const codeInput = document.getElementById('input-snippet-code');
+
+  const title = nameInput.value.trim() || 'Ligne personnalisée';
+  const code = codeInput.value.trim();
+
+  if (!code) {
+    alert('Veuillez renseigner le code ou la ligne à sauvegarder.');
+    return;
+  }
+
+  const list = getUserSnippets();
+  list.unshift({
+    id: Date.now(),
+    title: title,
+    code: code
+  });
+
+  saveUserSnippets(list);
+  renderUserSnippets();
+  closeSaveSnippetModal();
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// 4. INITIALISATION DU MOTEUR STRUDEL HEADLESS
 async function ensureEngine() {
   if (!repl) {
     updateStatus('Initialisation du moteur audio...', 'stopped');
@@ -63,12 +206,16 @@ async function ensureEngine() {
   return repl;
 }
 
-// 4. TRANSPORT AUDIO (PLAY / STOP)
+// 5. TRANSPORT AUDIO (PLAY / STOP)
 async function play() {
   try {
-    const engine = await ensureEngine();
-    const code = document.getElementById('code-editor').value;
+    const code = document.getElementById('code-editor').value.trim();
+    if (!code) {
+      updateStatus('Aucun code à jouer. Écrivez ou insérez une ligne.', 'stopped');
+      return;
+    }
 
+    const engine = await ensureEngine();
     engine.evaluate(code);
     isPlaying = true;
 
@@ -107,7 +254,7 @@ function updateStatus(text, state) {
   textEl.textContent = text;
 }
 
-// 5. MÉTRONOME VISUEL (4 TEMPS)
+// 6. MÉTRONOME VISUEL (4 TEMPS)
 function startMetro() {
   stopMetro();
   const beatIntervalMs = (60 / currentBpm) * 1000;
@@ -137,7 +284,7 @@ function stopMetro() {
   }
 }
 
-// 6. VISUALISEUR AUDIO CANVAS (Oscilloscope)
+// 7. VISUALISEUR AUDIO CANVAS (Oscilloscope)
 function startVisualizer() {
   const canvas = document.getElementById('oscilloscope');
   const ctx = canvas.getContext('2d');
@@ -191,7 +338,7 @@ function startVisualizer() {
   draw();
 }
 
-// 7. GESTION DES MISES À JOUR
+// 8. GESTION DES MISES À JOUR
 async function checkUpdates(silent = false) {
   const btnUpdate = document.getElementById('btn-update');
   const updateIcon = document.getElementById('update-icon');
@@ -274,19 +421,51 @@ async function triggerInstallUpdate() {
   }
 }
 
-// 8. INITIALISATION DES CONTRÔLES
+// 9. INITIALISATION DES CONTRÔLES
 document.addEventListener('DOMContentLoaded', () => {
   const editor = document.getElementById('code-editor');
 
-  // Code par défaut
+  // Éditeur vierge
   editor.value = DEFAULT_CODE;
 
-  // Boutons Play / Stop
-  document.getElementById('btn-play').onclick = () => {
-    play();
+  // Rendu initial des snippets de l'utilisateur
+  renderUserSnippets();
+
+  // Bouton : Sauvegarder la sélection de l'éditeur
+  document.getElementById('btn-save-selection').onclick = () => {
+    const start = editor.selectionStart;
+    const end = editor.selectionEnd;
+    let selectedText = editor.value.substring(start, end).trim();
+
+    // Si aucune sélection explicite, on prend la ligne courante où se trouve le curseur
+    if (!selectedText) {
+      const allLines = editor.value.split('\n');
+      let charCount = 0;
+      for (const line of allLines) {
+        if (start >= charCount && start <= charCount + line.length) {
+          selectedText = line.trim();
+          break;
+        }
+        charCount += line.length + 1;
+      }
+    }
+
+    openSaveSnippetModal(selectedText);
   };
 
-  document.getElementById('btn-stop').onclick = stop;
+  // Bouton : Ajouter manuellement un snippet
+  document.getElementById('btn-add-snippet').onclick = () => {
+    openSaveSnippetModal('');
+  };
+
+  // Modale Snippet
+  document.getElementById('btn-close-snippet-modal').onclick = closeSaveSnippetModal;
+  document.getElementById('btn-cancel-snippet').onclick = closeSaveSnippetModal;
+  document.getElementById('btn-confirm-save-snippet').onclick = confirmSaveSnippet;
+
+  // Boutons Play / Stop
+  document.getElementById('btn-play').onclick = () => play();
+  document.getElementById('btn-stop').onclick = () => stop();
 
   // Gestion du Tempo (BPM)
   const tempoInput = document.getElementById('tempo-input');
@@ -346,30 +525,6 @@ document.addEventListener('DOMContentLoaded', () => {
   setupMacro('slider-macroRoom', 'macroRoom', 'val-macroRoom');
   setupMacro('slider-masterVolume', 'masterGainValue', 'val-masterVolume', '%');
 
-  // Insertion de snippets au curseur
-  document.querySelectorAll('.btn-snippet').forEach(btn => {
-    btn.onclick = () => {
-      const snippet = btn.getAttribute('data-code');
-      const start = editor.selectionStart;
-      const end = editor.selectionEnd;
-      const text = editor.value;
-      editor.value = text.substring(0, start) + '\n  ' + snippet + text.substring(end);
-      editor.focus();
-    };
-  });
-
-  // Insertion de tags sonores
-  document.querySelectorAll('.sound-tag').forEach(tag => {
-    tag.onclick = () => {
-      const textToInsert = tag.getAttribute('data-insert');
-      const start = editor.selectionStart;
-      const end = editor.selectionEnd;
-      const text = editor.value;
-      editor.value = text.substring(0, start) + textToInsert + text.substring(end);
-      editor.focus();
-    };
-  });
-
   // Raccourcis Clavier
   window.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
@@ -388,8 +543,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Fichiers (Electron Desktop API)
   document.getElementById('btn-new').onclick = () => {
-    if (confirm('Créer un nouveau fichier ?')) {
-      editor.value = `setcps(128/60/4)\n\ns("bd*4")`;
+    if (confirm('Créer un nouveau fichier vide ?')) {
+      editor.value = '';
       document.getElementById('current-filename').textContent = 'nouveau.strudel';
     }
   };
