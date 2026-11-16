@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Strudel Studio</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- 1. TOP TRANSPORT BAR -->
+  <header class="transport-bar">
+    <div class="brand">
+      <div class="brand-logo">⚡</div>
+      <span class="brand-title">STRUDEL STUDIO</span>
+      <span class="brand-badge">Desktop</span>
+    </div>
+
+    <!-- Transport Buttons -->
+    <div class="transport-controls">
+      <button id="btn-play" class="btn-play" title="Jouer (Ctrl+Entrée)">
+        <span id="play-icon">▶</span>
+        <span id="play-text">PLAY</span>
+      </button>
+
+      <button id="btn-stop" class="btn-stop" title="Arrêter tout (Ctrl+.)">
+        <span>⏹</span>
+        <span>STOP</span>
+      </button>
+
+      <!-- Metro Pulse Lights -->
+      <div class="metro-box" title="Pulsations du cycle">
+        <div class="metro-dot downbeat" id="dot-0"></div>
+        <div class="metro-dot" id="dot-1"></div>
+        <div class="metro-dot" id="dot-2"></div>
+        <div class="metro-dot" id="dot-3"></div>
+      </div>
+
+      <!-- Tempo (BPM) Stepper -->
+      <div class="tempo-box">
+        <span style="font-size: 11px; font-weight: 700; color: #6b7280;">BPM</span>
+        <input type="number" id="tempo-input" class="tempo-input" value="128" min="30" max="300">
+        <button id="tempo-minus" class="tempo-btn">−</button>
+        <button id="tempo-plus" class="tempo-btn">+</button>
+        <button id="btn-tap" class="tempo-btn" style="width: auto; padding: 0 6px; font-size: 10px;" title="Taper le tempo">TAP</button>
+      </div>
+    </div>
+
+    <!-- Native File Actions -->
+    <div class="file-actions">
+      <button id="btn-new" class="btn-action">📄 Nouveau</button>
+      <button id="btn-open" class="btn-action">📂 Ouvrir...</button>
+      <button id="btn-save" class="btn-action">💾 Sauvegarder</button>
+    </div>
+  </header>
+
+  <!-- 2. MAIN 3-PANEL WORKSPACE -->
+  <main class="main-workspace">
+
+    <!-- LEFT SIDEBAR : PRESETS & SNIPPETS -->
+    <aside class="sidebar-left">
+      <div class="panel-header">
+        <span>Presets d'Usine</span>
+        <span style="font-size: 10px; color: #9ca3af;">6 styles</span>
+      </div>
+
+      <div class="preset-list" id="preset-list">
+        <!-- Rempli dynamiquement par JS -->
+      </div>
+
+      <!-- Quick Snippets -->
+      <div class="snippets-section">
+        <div class="panel-header" style="padding: 6px 0; border: none; margin-bottom: 8px;">
+          <span>Insertion Rapide</span>
+        </div>
+        <div class="snippet-grid">
+          <button class="btn-snippet" data-code='s("bd [~ cp] bd [~ cp]").bank("RolandTR909")'>+ Beat 909</button>
+          <button class="btn-snippet" data-code='s("hh*8 [oh hh]").gain(0.8)'>+ Hats Groove</button>
+          <button class="btn-snippet" data-code='note("c2 [~ c2] eb2 f2").s("sawtooth").lpf(macroLPF)'>+ Bass Synth</button>
+          <button class="btn-snippet" data-code='note("<c3&apos;maj7 f3&apos;maj7>").s("gm_electric_piano_1").room(macroRoom)'>+ Rhodes</button>
+          <button class="btn-snippet" data-code='note("c4 eb4 g4 bb4").arp("updown").s("gm_vibraphone")'>+ Arpège</button>
+          <button class="btn-snippet" data-code='s("amencutup").n("<0 [4 2] 3 [5 7]>")'>+ Amen Break</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER PANEL : CODE EDITOR -->
+    <section class="center-editor-container">
+      <div class="editor-header">
+        <div class="file-tab">
+          <span>⚡</span>
+          <span id="current-filename">mon_pattern.strudel</span>
+        </div>
+        <div style="font-size: 11px;">
+          <kbd style="background: #1f2438; padding: 2px 5px; border-radius: 4px; border: 1px solid #333;">Ctrl + Entrée</kbd> pour Évaluer
+        </div>
+      </div>
+
+      <div class="editor-wrapper">
+        <textarea id="code-editor" spellcheck="false" placeholder="// Écrivez votre code Strudel ici..."></textarea>
+      </div>
+
+      <div class="editor-status-bar">
+        <div id="status-indicator" class="status-badge stopped">
+          <span style="font-size: 14px;">●</span>
+          <span id="status-text">Prêt (Arrêté)</span>
+        </div>
+        <div id="engine-stats" style="color: #6b7280; font-size: 11px;">
+          Moteur : WebAudio Headless Superdough
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT SIDEBAR : OSCILLOSCOPE & MACROS -->
+    <aside class="sidebar-right">
+      <!-- Oscilloscope Canvas -->
+      <div class="visualizer-card">
+        <div class="panel-header" style="padding: 0 0 8px 0; border: none;">
+          <span>Visualiseur Audio</span>
+          <span id="fps-counter" style="font-size: 10px; color: #10b981;">ACTIF</span>
+        </div>
+        <canvas id="oscilloscope" width="268" height="110"></canvas>
+      </div>
+
+      <!-- Macro Controls -->
+      <div class="macros-card">
+        <div class="panel-header" style="padding: 0 0 4px 0; border: none;">
+          <span>Macros en Direct</span>
+        </div>
+
+        <!-- Macro 1 : LPF Cutoff -->
+        <div class="macro-control">
+          <div class="macro-label">
+            <span>Cutoff Filtre (macroLPF)</span>
+            <span id="val-macroLPF">1200 Hz</span>
+          </div>
+          <input type="range" id="slider-macroLPF" class="macro-slider" min="100" max="6000" value="1200">
+        </div>
+
+        <!-- Macro 2 : LPQ Resonance -->
+        <div class="macro-control">
+          <div class="macro-label">
+            <span>Résonance (macroLPQ)</span>
+            <span id="val-macroLPQ">6.0</span>
+          </div>
+          <input type="range" id="slider-macroLPQ" class="macro-slider" min="0.5" max="18" step="0.5" value="6">
+        </div>
+
+        <!-- Macro 3 : Room / Reverb -->
+        <div class="macro-control">
+          <div class="macro-label">
+            <span>Reverb (macroRoom)</span>
+            <span id="val-macroRoom">0.50</span>
+          </div>
+          <input type="range" id="slider-macroRoom" class="macro-slider" min="0" max="1" step="0.05" value="0.5">
+        </div>
+
+        <!-- Macro 4 : Master Volume -->
+        <div class="macro-control">
+          <div class="macro-label">
+            <span>Volume Général</span>
+            <span id="val-masterVolume">85%</span>
+          </div>
+          <input type="range" id="slider-masterVolume" class="macro-slider" min="0" max="1" step="0.01" value="0.85">
+        </div>
+      </div>
+
+      <!-- Quick Instruments List -->
+      <div class="quick-ref-card">
+        <div class="panel-header" style="padding: 0 0 6px 0; border: none; margin-bottom: 6px;">
+          <span>Aide Mémoire Sons</span>
+        </div>
+        <p style="margin-bottom: 6px; font-weight: 600;">Boîtes TR :</p>
+        <div>
+          <span class="badge-tag">RolandTR909</span>
+          <span class="badge-tag">RolandTR808</span>
+          <span class="badge-tag">AkaiLinn</span>
+          <span class="badge-tag">EmuSP1200</span>
+        </div>
+
+        <p style="margin: 8px 0 6px 0; font-weight: 600;">Soundfonts GM :</p>
+        <div>
+          <span class="badge-tag">gm_piano</span>
+          <span class="badge-tag">gm_electric_piano_1</span>
+          <span class="badge-tag">gm_vibraphone</span>
+          <span class="badge-tag">gm_synth_bass_1</span>
+          <span class="badge-tag">gm_strings</span>
+          <span class="badge-tag">gm_sitar</span>
+        </div>
+      </div>
+    </aside>
+
+  </main>
+
+  <script type="module" src="renderer.js"></script>
+</body>
+</html>
