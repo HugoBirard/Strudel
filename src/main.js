@@ -77,20 +77,30 @@ ipcMain.handle('dialog:saveFile', async (event, { content, defaultPath }) => {
 // 2. SYSTÈME DE VÉRIFICATION ET INSTALLATION DE MISES À JOUR
 const APP_ROOT = path.join(__dirname, '..');
 
+async function getCurrentBranch() {
+  try {
+    const { stdout } = await execPromise('git rev-parse --abbrev-ref HEAD', { cwd: APP_ROOT });
+    return stdout.trim() || 'main';
+  } catch (e) {
+    return 'main';
+  }
+}
+
 ipcMain.handle('updater:check', async () => {
   try {
-    // 1. Récupération des nouveautés distantes depuis origin/app
-    await execPromise('git fetch origin app', { cwd: APP_ROOT });
+    const branch = await getCurrentBranch();
+    // 1. Récupération des nouveautés distantes
+    await execPromise(`git fetch origin ${branch}`, { cwd: APP_ROOT });
 
     // 2. Comparaison des hash commits
     const { stdout: localStdout } = await execPromise('git rev-parse --short HEAD', { cwd: APP_ROOT });
-    const { stdout: remoteStdout } = await execPromise('git rev-parse --short origin/app', { cwd: APP_ROOT });
+    const { stdout: remoteStdout } = await execPromise(`git rev-parse --short origin/${branch}`, { cwd: APP_ROOT });
 
     const localCommit = localStdout.trim();
     const remoteCommit = remoteStdout.trim();
 
     if (localCommit !== remoteCommit) {
-      const { stdout: logStdout } = await execPromise('git log HEAD..origin/app --oneline', { cwd: APP_ROOT });
+      const { stdout: logStdout } = await execPromise(`git log HEAD..origin/${branch} --oneline`, { cwd: APP_ROOT });
       return {
         hasUpdate: true,
         currentVersion: localCommit,
@@ -112,8 +122,9 @@ ipcMain.handle('updater:check', async () => {
 
 ipcMain.handle('updater:install', async () => {
   try {
-    // 1. Mise à jour du code via git pull
-    await execPromise('git pull origin app', { cwd: APP_ROOT });
+    const branch = await getCurrentBranch();
+    // 1. Mise à jour du code via git pull sur la branche courante
+    await execPromise(`git pull origin ${branch}`, { cwd: APP_ROOT });
 
     // 2. Mise à jour des paquets npm si nécessaire
     await execPromise('npm install', { cwd: APP_ROOT });
