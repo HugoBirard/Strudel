@@ -20,7 +20,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
       contextIsolation: true,
-      webSecurity: true, // Sécurité Web activée (Protection SOP / CSP)
+      webSecurity: true, // Sécurité Web activée
       sandbox: false
     }
   });
@@ -62,7 +62,6 @@ ipcMain.handle('dialog:openFile', async () => {
 
   try {
     const filePath = filePaths[0];
-    // Validation du chemin
     if (typeof filePath !== 'string' || !fs.existsSync(filePath)) return null;
 
     const content = fs.readFileSync(filePath, 'utf-8');
@@ -102,9 +101,19 @@ ipcMain.handle('dialog:saveFile', async (event, data) => {
 
 // 2. SYSTÈME SÉCURISÉ DE VÉRIFICATION ET INSTALLATION DE MISES À JOUR
 const APP_ROOT = path.join(__dirname, '..');
-
-// Regex de validation stricte pour les noms de branches Git (évite toute injection de commande)
+const EXPECTED_REPO = 'HugoBirard/Strudel';
 const VALID_BRANCH_REGEX = /^[a-zA-Z0-9_\-\.\/]+$/;
+
+async function verifyRemoteRepo() {
+  try {
+    const { stdout } = await execFilePromise('git', ['remote', 'get-url', 'origin'], { cwd: APP_ROOT });
+    const url = stdout.trim();
+    const isMatching = url.toLowerCase().includes(EXPECTED_REPO.toLowerCase());
+    return { url, isMatching, repoName: EXPECTED_REPO };
+  } catch (e) {
+    return { url: 'unknown', isMatching: false, repoName: EXPECTED_REPO };
+  }
+}
 
 async function getCurrentBranch() {
   try {
@@ -118,9 +127,11 @@ async function getCurrentBranch() {
 
 ipcMain.handle('updater:check', async () => {
   try {
+    // Vérification de conformité du dépôt distant
+    const repoInfo = await verifyRemoteRepo();
     const branch = await getCurrentBranch();
 
-    // 1. Récupération des nouveautés distantes (avec execFile sécurisé sans shell)
+    // 1. Récupération des nouveautés distantes
     await execFilePromise('git', ['fetch', 'origin', branch], { cwd: APP_ROOT });
 
     // 2. Comparaison des hash commits
@@ -134,6 +145,8 @@ ipcMain.handle('updater:check', async () => {
       const { stdout: logStdout } = await execFilePromise('git', ['log', `HEAD..origin/${branch}`, '--oneline'], { cwd: APP_ROOT });
       return {
         hasUpdate: true,
+        repo: repoInfo,
+        branch: branch,
         currentVersion: localCommit,
         latestVersion: remoteCommit,
         changelog: logStdout.trim() || 'Nouvelles fonctionnalités et améliorations du moteur.'
@@ -142,6 +155,8 @@ ipcMain.handle('updater:check', async () => {
 
     return {
       hasUpdate: false,
+      repo: repoInfo,
+      branch: branch,
       currentVersion: localCommit,
       latestVersion: remoteCommit
     };
@@ -153,9 +168,14 @@ ipcMain.handle('updater:check', async () => {
 
 ipcMain.handle('updater:install', async () => {
   try {
+    const repoInfo = await verifyRemoteRepo();
+    if (!repoInfo.isMatching) {
+      throw new Error(`Le dépôt distant (${repoInfo.url}) ne correspond pas à ${EXPECTED_REPO}`);
+    }
+
     const branch = await getCurrentBranch();
 
-    // 1. Mise à jour du code via git pull sécurisé
+    // 1. Mise à jour sécurisée du code via git pull
     await execFilePromise('git', ['pull', 'origin', branch], { cwd: APP_ROOT });
 
     // 2. Mise à jour des paquets npm

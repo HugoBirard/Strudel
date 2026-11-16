@@ -1,4 +1,4 @@
-import { initStrudel } from '../node_modules/@strudel/web/dist/index.mjs';
+import { initStrudel, getAudioContext } from '../node_modules/@strudel/web/dist/index.mjs';
 
 // 1. MACROS GLOBALES (Modifiables en direct par les sliders)
 window.macroLPF = 1200;
@@ -18,7 +18,36 @@ let audioContext = null;
 // L'éditeur commence vierge (aucun code pré-fait)
 const DEFAULT_CODE = "";
 
-// 3. GESTION DU THÈME ET DE LA PERSONNALISATION DE FOND
+// 3. INTERCEPTION WEBAUDIO POUR LE VISUALISATEUR AUDIO
+function setupGlobalAudioInterceptor() {
+  if (window._audioInterceptorInstalled) return;
+  window._audioInterceptorInstalled = true;
+
+  const originalConnect = AudioNode.prototype.connect;
+  AudioNode.prototype.connect = function(dest, ...args) {
+    try {
+      if (analyserNode && this !== analyserNode) {
+        const isDestination = (dest instanceof AudioDestinationNode) ||
+          (dest && dest.numberOfOutputs === 0 && dest.maxChannelCount !== undefined) ||
+          (dest && dest.constructor && dest.constructor.name === 'AudioDestinationNode') ||
+          (dest && dest.constructor && dest.constructor.name === 'ChannelMergerNode') ||
+          (dest && dest.constructor && dest.constructor.name === 'GainNode' && dest.channelCountMode);
+
+        if (isDestination) {
+          originalConnect.call(this, analyserNode);
+        }
+      }
+    } catch (e) {
+      // Ignorer silencieusement
+    }
+    return originalConnect.call(this, dest, ...args);
+  };
+}
+
+// Installe l'intercepteur immédiatement
+setupGlobalAudioInterceptor();
+
+// 4. GESTION DU THÈME ET DE LA PERSONNALISATION DE FOND
 const THEME_STORAGE_KEY = 'strudel_active_theme';
 
 function loadSavedTheme() {
@@ -30,7 +59,6 @@ function applyTheme(themeClass) {
   document.body.className = themeClass;
   localStorage.setItem(THEME_STORAGE_KEY, themeClass);
 
-  // Mise à jour de l'état actif dans la grille
   document.querySelectorAll('.theme-card').forEach(card => {
     if (card.getAttribute('data-theme') === themeClass) {
       card.classList.add('active');
@@ -48,7 +76,7 @@ function closeThemeModal() {
   document.getElementById('theme-modal').classList.remove('open');
 }
 
-// 4. GESTION DES SNIPPETS PERSONNALISÉS DE L'UTILISATEUR
+// 5. GESTION DES SNIPPETS PERSONNALISÉS DE L'UTILISATEUR
 const SNIPPETS_STORAGE_KEY = 'strudel_user_snippets';
 
 function getUserSnippets() {
@@ -114,7 +142,6 @@ function renderUserSnippets() {
       </button>
     `;
 
-    // Événements d'insertion et suppression
     card.querySelectorAll('[data-action="insert"]').forEach(el => {
       el.onclick = () => insertSnippetIntoEditor(snippet.code);
     });
@@ -128,7 +155,7 @@ function renderUserSnippets() {
   });
 }
 
-// CORRECTION BUG : Insertion exacte au curseur SANS forcer de saut de ligne
+// CORRECTION BUG : Insertion exacte au curseur sans sauter de ligne
 function insertSnippetIntoEditor(code) {
   const editor = document.getElementById('code-editor');
   editor.focus();
@@ -137,12 +164,11 @@ function insertSnippetIntoEditor(code) {
   const end = editor.selectionEnd;
   const currentText = editor.value;
 
-  // Insertion exacte au curseur sans ajout de '\n' intempestif
+  // Insertion directe à l'emplacement précis du curseur sans ajout de \n
   editor.value = currentText.substring(0, start) + code + currentText.substring(end);
   const newPos = start + code.length;
   editor.setSelectionRange(newPos, newPos);
 
-  // Notifie le changement
   editor.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
@@ -200,7 +226,7 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-// 5. INITIALISATION DU MOTEUR STRUDEL HEADLESS
+// 6. INITIALISATION DU MOTEUR STRUDEL HEADLESS & WEBAUDIO ANALYSER
 async function ensureEngine() {
   if (!repl) {
     updateStatus('Initialisation du moteur audio...', 'stopped');
@@ -209,18 +235,17 @@ async function ensureEngine() {
     });
 
     try {
-      const webaudio = window.__strudel_webaudio || (repl && repl.webaudio);
-      if (webaudio && webaudio.ctx) {
-        audioContext = webaudio.ctx;
+      if (typeof getAudioContext === 'function') {
+        audioContext = getAudioContext();
       } else {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const webaudio = window.__strudel_webaudio || (repl && repl.webaudio);
+        audioContext = (webaudio && webaudio.ctx) ? webaudio.ctx : new (window.AudioContext || window.webkitAudioContext)();
       }
 
-      analyserNode = audioContext.createAnalyser();
-      analyserNode.fftSize = 256;
-
-      if (webaudio && webaudio.master) {
-        webaudio.master.connect(analyserNode);
+      if (audioContext && !analyserNode) {
+        analyserNode = audioContext.createAnalyser();
+        analyserNode.fftSize = 512;
+        analyserNode.smoothingTimeConstant = 0.8;
       }
     } catch (e) {
       console.warn('AudioContext Analyser:', e);
@@ -231,7 +256,7 @@ async function ensureEngine() {
   return repl;
 }
 
-// 6. TRANSPORT AUDIO (PLAY / STOP)
+// 7. TRANSPORT AUDIO (PLAY / STOP)
 async function play() {
   try {
     const code = document.getElementById('code-editor').value.trim();
@@ -241,6 +266,12 @@ async function play() {
     }
 
     const engine = await ensureEngine();
+    
+    // Débloque l'audioContext si suspendu
+    if (audioContext && audioContext.state === 'suspended') {
+      await audioContext.resume();
+    }
+
     engine.evaluate(code);
     isPlaying = true;
 
@@ -279,7 +310,7 @@ function updateStatus(text, state) {
   textEl.textContent = text;
 }
 
-// 7. MÉTRONOME VISUEL (4 TEMPS)
+// 8. MÉTRONOME VISUEL (4 TEMPS)
 function startMetro() {
   stopMetro();
   const beatIntervalMs = (60 / currentBpm) * 1000;
@@ -309,44 +340,90 @@ function stopMetro() {
   }
 }
 
-// 8. VISUALISEUR AUDIO CANVAS (Oscilloscope)
+// 9. VISUALISEUR AUDIO CANVAS (OSCILLOSCOPE + SPECTRE RÉACTIF EN TEMPS RÉEL)
+let visualizerRunning = false;
+
 function startVisualizer() {
+  if (visualizerRunning) return;
+  visualizerRunning = true;
+
   const canvas = document.getElementById('oscilloscope');
   const ctx = canvas.getContext('2d');
-  const bufferLength = analyserNode ? analyserNode.frequencyBinCount : 128;
-  const dataArray = new Uint8Array(bufferLength);
+  const bufferLength = 256;
+  const timeData = new Uint8Array(bufferLength);
+  const freqData = new Uint8Array(bufferLength);
 
   function draw() {
     requestAnimationFrame(draw);
 
+    const w = canvas.width;
+    const h = canvas.height;
+
+    // Fond obscur accordé au thème
+    ctx.fillStyle = 'rgba(7, 8, 12, 0.45)';
+    ctx.fillRect(0, 0, w, h);
+
+    // Couleurs dynamiques selon le thème actif
+    const computed = getComputedStyle(document.body);
+    const accentColor = computed.getPropertyValue('--accent').trim() || '#10b981';
+    const primaryColor = computed.getPropertyValue('--primary').trim() || '#6366f1';
+
+    let hasAudioSignal = false;
+
     if (analyserNode && isPlaying) {
-      analyserNode.getByteTimeDomainData(dataArray);
-    } else {
+      analyserNode.getByteTimeDomainData(timeData);
+      analyserNode.getByteFrequencyData(freqData);
+
+      let sum = 0;
       for (let i = 0; i < bufferLength; i++) {
-        dataArray[i] = 128;
+        const diff = timeData[i] - 128;
+        sum += diff * diff;
+      }
+      const rms = Math.sqrt(sum / bufferLength);
+      hasAudioSignal = rms > 0.8;
+    }
+
+    // 1. Spectre de Fréquence en arrière-plan
+    if (hasAudioSignal) {
+      const barCount = 28;
+      const barWidth = w / barCount;
+      for (let i = 0; i < barCount; i++) {
+        const val = freqData[i * 3] || 0;
+        const barHeight = (val / 255.0) * (h * 0.65);
+        ctx.fillStyle = primaryColor + '20'; // 12% opacité
+        ctx.fillRect(i * barWidth, h - barHeight, barWidth - 1, barHeight);
       }
     }
 
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+    // 2. Grille centrale discrète
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(0, canvas.height / 2);
-    ctx.lineTo(canvas.width, canvas.height / 2);
+    ctx.moveTo(0, h / 2);
+    ctx.lineTo(w, h / 2);
     ctx.stroke();
 
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = isPlaying ? '#10b981' : '#475569';
+    // 3. Dessin de l'onde (Oscilloscope)
     ctx.beginPath();
+    ctx.lineWidth = hasAudioSignal ? 2.5 : 1.5;
+    ctx.strokeStyle = hasAudioSignal ? accentColor : 'rgba(255, 255, 255, 0.15)';
 
-    const sliceWidth = (canvas.width * 1.0) / bufferLength;
+    if (hasAudioSignal) {
+      ctx.shadowColor = accentColor;
+      ctx.shadowBlur = 8;
+    } else {
+      ctx.shadowBlur = 0;
+    }
+
+    const sliceWidth = w / bufferLength;
     let x = 0;
 
     for (let i = 0; i < bufferLength; i++) {
-      const v = dataArray[i] / 128.0;
-      const y = (v * canvas.height) / 2;
+      let v = 128;
+      if (hasAudioSignal) {
+        v = timeData[i];
+      }
+      const y = (v / 255.0) * h;
 
       if (i === 0) {
         ctx.moveTo(x, y);
@@ -356,14 +433,15 @@ function startVisualizer() {
       x += sliceWidth;
     }
 
-    ctx.lineTo(canvas.width, canvas.height / 2);
+    ctx.lineTo(w, h / 2);
     ctx.stroke();
+    ctx.shadowBlur = 0;
   }
 
   draw();
 }
 
-// 9. GESTION DES MISES À JOUR
+// 10. GESTION DES MISES À JOUR AVEC CONTRÔLE DE DÉPÔT STRICT
 async function checkUpdates(silent = false) {
   const btnUpdate = document.getElementById('btn-update');
   const updateIcon = document.getElementById('update-icon');
@@ -392,7 +470,10 @@ async function checkUpdates(silent = false) {
       btnUpdate.classList.remove('has-update');
       updateDot.style.display = 'none';
       if (!silent) {
-        alert('Votre version de Strudel Studio est parfaitement à jour (' + (res.currentVersion || 'Dernier commit') + ').');
+        const repoMsg = res.repo && res.repo.isMatching 
+          ? `sur le dépôt ${res.repo.repoName}` 
+          : '';
+        alert(`Votre version de Strudel Studio est parfaitement à jour (${res.currentVersion || 'Dernier commit'}) ${repoMsg}.`);
       }
     }
   } catch (err) {
@@ -409,8 +490,15 @@ function openUpdateModal(updateInfo) {
   const msg = document.getElementById('modal-update-msg');
   const changelog = document.getElementById('modal-changelog');
 
+  const repoStatus = updateInfo.repo && updateInfo.repo.isMatching 
+    ? `<span style="color: #10b981;">✓ Dépôt vérifié : ${updateInfo.repo.repoName}</span>` 
+    : `<span style="color: #f59e0b;">⚠ Dépôt : ${updateInfo.repo?.url || 'inconnu'}</span>`;
+
   title.textContent = 'Mise à jour disponible (' + updateInfo.latestVersion + ')';
-  msg.textContent = `Votre version actuelle est ${updateInfo.currentVersion}. Une version plus récente est disponible sur la branche app.`;
+  msg.innerHTML = `
+    <div style="margin-bottom: 8px;">${repoStatus} (branche: <code>${updateInfo.branch || 'update'}</code>)</div>
+    <div>Votre version locale est <code>${updateInfo.currentVersion}</code>. Une version plus récente est prête à être installée.</div>
+  `;
   changelog.textContent = updateInfo.changelog || 'Mise à jour des composants et améliorations diverses.';
 
   modal.classList.add('open');
@@ -446,12 +534,13 @@ async function triggerInstallUpdate() {
   }
 }
 
-// 10. INITIALISATION DES CONTRÔLES
+// 11. INITIALISATION DES CONTRÔLES AU CHARGEMENT DU DOM
 document.addEventListener('DOMContentLoaded', () => {
   const editor = document.getElementById('code-editor');
 
-  // Charge le thème personnalisé sauvegardé
+  // Charge le thème et démarre le visualiseur
   loadSavedTheme();
+  startVisualizer();
 
   // Éditeur vierge
   editor.value = DEFAULT_CODE;
@@ -459,7 +548,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Rendu des snippets de l'utilisateur
   renderUserSnippets();
 
-  // Bouton Thème
+  // Boutons Thème
   document.getElementById('btn-theme').onclick = openThemeModal;
   document.getElementById('btn-close-theme-modal').onclick = closeThemeModal;
   document.getElementById('btn-close-theme').onclick = closeThemeModal;
@@ -477,7 +566,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const end = editor.selectionEnd;
     let selectedText = editor.value.substring(start, end);
 
-    // Si aucune sélection explicite, on prend la ligne courante où se trouve le curseur
     if (!selectedText) {
       const allLines = editor.value.split('\n');
       let charCount = 0;

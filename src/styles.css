@@ -1,34 +1,33 @@
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap');
 
 /* ==========================================================================
-   THEMES & VARIABLES CSS
+   THEMES & VARIABLES CSS (FONDS PURS & PROFONDS, ZERO GRIS PARASITE)
    ========================================================================== */
 
 /* 1. THÈME OBSIDIAN (DÉFAUT) */
 body.theme-obsidian {
-  --bg-dark: #0a0b10;
-  --bg-panel: rgba(17, 19, 28, 0.85);
-  --bg-card: #181b28;
-  --bg-card-hover: #222638;
-  --border: #23273a;
+  --bg-dark: #07080c;
+  --bg-panel: #0d0f17;
+  --bg-card: #131622;
+  --bg-card-hover: #1c2032;
+  --border: rgba(255, 255, 255, 0.07);
   --border-focus: #6366f1;
-  --text-main: #f3f4f6;
+  --text-main: #f8fafc;
   --text-muted: #94a3b8;
   --accent: #10b981;
   --accent-glow: rgba(16, 185, 129, 0.35);
   --danger: #ef4444;
   --primary: #6366f1;
   --primary-glow: rgba(99, 102, 241, 0.4);
-  --bar-gradient: linear-gradient(180deg, rgba(24, 27, 40, 0.95) 0%, rgba(14, 16, 24, 0.98) 100%);
 }
 
 /* 2. THÈME CYBERPUNK */
 body.theme-cyberpunk {
-  --bg-dark: #050508;
-  --bg-panel: rgba(12, 13, 22, 0.85);
-  --bg-card: #141624;
-  --bg-card-hover: #20243d;
-  --border: #281d3d;
+  --bg-dark: #040407;
+  --bg-panel: #0a0b14;
+  --bg-card: #121422;
+  --bg-card-hover: #1c1f36;
+  --border: rgba(236, 72, 153, 0.18);
   --border-focus: #ec4899;
   --text-main: #fdf2f8;
   --text-muted: #a5b4fc;
@@ -37,34 +36,32 @@ body.theme-cyberpunk {
   --danger: #ff0055;
   --primary: #ec4899;
   --primary-glow: rgba(236, 72, 153, 0.45);
-  --bar-gradient: linear-gradient(180deg, rgba(24, 14, 38, 0.95) 0%, rgba(10, 8, 18, 0.98) 100%);
 }
 
 /* 3. THÈME TOKYO MIDNIGHT */
 body.theme-tokyo {
-  --bg-dark: #0f0f1c;
-  --bg-panel: rgba(22, 22, 39, 0.85);
-  --bg-card: #20203a;
-  --bg-card-hover: #2c2c4d;
-  --border: #323456;
+  --bg-dark: #0a0a14;
+  --bg-panel: #111122;
+  --bg-card: #191932;
+  --bg-card-hover: #232346;
+  --border: rgba(139, 92, 246, 0.18);
   --border-focus: #8b5cf6;
-  --text-main: #e2e8f0;
+  --text-main: #f1f5f9;
   --text-muted: #94a3b8;
   --accent: #38bdf8;
   --accent-glow: rgba(56, 189, 248, 0.4);
   --danger: #f43f5e;
   --primary: #a855f7;
   --primary-glow: rgba(168, 85, 247, 0.4);
-  --bar-gradient: linear-gradient(180deg, rgba(29, 27, 56, 0.95) 0%, rgba(17, 16, 33, 0.98) 100%);
 }
 
 /* 4. THÈME DEEP SPACE */
 body.theme-space {
-  --bg-dark: #030712;
-  --bg-panel: rgba(11, 18, 38, 0.85);
-  --bg-card: #111e3b;
-  --bg-card-hover: #1b2d58;
-  --border: #1e315b;
+  --bg-dark: #02050e;
+  --bg-panel: #070d1e;
+  --bg-card: #0e1832;
+  --bg-card-hover: #152449;
+  --border: rgba(59, 130, 246, 0.18);
   --border-focus: #3b82f6;
   --text-main: #f8fafc;
   --text-muted: #93c5fd;
@@ -73,16 +70,15 @@ body.theme-space {
   --danger: #ef4444;
   --primary: #3b82f6;
   --primary-glow: rgba(59, 130, 246, 0.4);
-  --bar-gradient: linear-gradient(180deg, rgba(16, 29, 64, 0.95) 0%, rgba(7, 13, 29, 0.98) 100%);
 }
 
 /* 5. THÈME MATRIX EMERALD */
 body.theme-matrix {
-  --bg-dark: #040906;
-  --bg-panel: rgba(6, 18, 12, 0.85);
-  --bg-card: #0d281a;
-  --bg-card-hover: #143d28;
-  --border: #16432b;
+  --bg-dark: #020603;
+  --bg-panel: #051008;
+  --bg-card: #091a0f;
+  --bg-card-hover: #0f2c19;
+  --border: rgba(16, 185, 129, 0.18);
   --border-focus: #10b981;
   --text-main: #ecfdf5;
   --text-muted: #6ee7b7;
@@ -91,16 +87,15 @@ body.theme-matrix {
   --danger: #f87171;
   --primary: #059669;
   --primary-glow: rgba(16, 185, 129, 0.4);
-  --bar-gradient: linear-gradient(180deg, rgba(12, 33, 21, 0.95) 0%, rgba(5, 15, 9, 0.98) 100%);
 }
 
 /* 6. THÈME RETRO SYNTHWAVE */
 body.theme-synthwave {
-  --bg-dark: #12071f;
-  --bg-panel: rgba(28, 12, 48, 0.85);
-  --bg-card: #2e1452;
-  --bg-card-hover: #411e73;
-  --border: #4d2385;
+  --bg-dark: #0c0314;
+  --bg-panel: #160724;
+  --bg-card: #220b38;
+  --bg-card-hover: #321252;
+  --border: rgba(245, 158, 11, 0.18);
   --border-focus: #f59e0b;
   --text-main: #fff7ed;
   --text-muted: #fed7aa;
@@ -109,7 +104,6 @@ body.theme-synthwave {
   --danger: #ef4444;
   --primary: #f43f5e;
   --primary-glow: rgba(244, 63, 94, 0.4);
-  --bar-gradient: linear-gradient(180deg, rgba(46, 20, 82, 0.95) 0%, rgba(20, 8, 36, 0.98) 100%);
 }
 
 /* ==========================================================================
@@ -136,8 +130,8 @@ body {
 
 /* SVG ICONS HELPER */
 .svg-icon {
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
   stroke-width: 2;
   stroke: currentColor;
   fill: none;
@@ -154,26 +148,23 @@ body {
 }
 
 /* ==========================================================================
-   TOP TRANSPORT BAR (AMÉLIORATION VISUELLE PREMIUM & GLASSMORPHISM)
+   BARRE SYSTÈME / TRANSPORT (COULEUR EXACTE DU FOND, ZERO GRIS)
    ========================================================================== */
 
 .transport-bar {
-  background: var(--bar-gradient);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background-color: var(--bg-dark) !important;
   border-bottom: 1px solid var(--border);
-  height: 62px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 18px;
   gap: 16px;
   z-index: 20;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
   position: relative;
 }
 
-/* Subtle glowing accent line on top of the bar */
+/* Subtile ligne de séparation lumineuse */
 .transport-bar::after {
   content: '';
   position: absolute;
@@ -181,8 +172,8 @@ body {
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent 0%, var(--primary) 30%, var(--accent) 70%, transparent 100%);
-  opacity: 0.35;
+  background: linear-gradient(90deg, transparent 0%, var(--primary) 25%, var(--accent) 75%, transparent 100%);
+  opacity: 0.25;
 }
 
 .brand {
@@ -192,40 +183,41 @@ body {
 }
 
 .brand-logo {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   background: linear-gradient(135deg, var(--accent), var(--primary));
-  border-radius: 9px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
-  box-shadow: 0 0 16px var(--primary-glow);
+  box-shadow: 0 0 14px var(--primary-glow);
   transition: transform 0.2s ease;
 }
 
 .brand-logo:hover {
-  transform: rotate(6deg) scale(1.05);
+  transform: rotate(5deg) scale(1.05);
 }
 
 .brand-title {
   font-size: 14px;
   font-weight: 800;
   letter-spacing: 0.8px;
+  color: var(--text-main);
 }
 
 .brand-badge {
   font-size: 9px;
   font-weight: 700;
   text-transform: uppercase;
-  background: rgba(99, 102, 241, 0.15);
-  color: var(--primary);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--accent);
   padding: 2px 6px;
   border-radius: 4px;
   border: 1px solid var(--border);
 }
 
-/* TRANSPORT BUTTONS & PULSE */
+/* BOUTONS DE TRANSPORT */
 .transport-controls {
   display: flex;
   align-items: center;
@@ -259,7 +251,7 @@ body {
 }
 
 .btn-stop {
-  background: var(--bg-card);
+  background: rgba(255, 255, 255, 0.03);
   color: #f87171;
   border: 1px solid rgba(239, 68, 68, 0.25);
   padding: 8px 14px;
@@ -284,18 +276,17 @@ body {
   display: flex;
   align-items: center;
   gap: 5px;
-  background: var(--bg-card);
+  background: rgba(255, 255, 255, 0.03);
   padding: 6px 10px;
   border-radius: 8px;
   border: 1px solid var(--border);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .metro-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #232738;
+  background: rgba(255, 255, 255, 0.12);
   transition: background 0.08s ease, transform 0.08s ease;
 }
 
@@ -314,7 +305,7 @@ body {
   display: flex;
   align-items: center;
   gap: 5px;
-  background: var(--bg-card);
+  background: rgba(255, 255, 255, 0.03);
   padding: 4px 8px;
   border-radius: 8px;
   border: 1px solid var(--border);
@@ -324,7 +315,7 @@ body {
   width: 44px;
   background: transparent;
   border: none;
-  color: #fff;
+  color: var(--text-main);
   font-weight: 700;
   font-family: 'Fira Code', monospace;
   font-size: 13px;
@@ -333,7 +324,7 @@ body {
 }
 
 .tempo-btn {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border);
   color: var(--text-muted);
   width: 22px;
@@ -350,7 +341,7 @@ body {
 
 .tempo-btn:hover {
   color: #fff;
-  background: var(--bg-card-hover);
+  background: rgba(255, 255, 255, 0.1);
   border-color: var(--border-focus);
 }
 
@@ -362,7 +353,7 @@ body {
 }
 
 .btn-action {
-  background: var(--bg-card);
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border);
   color: var(--text-muted);
   padding: 6px 11px;
@@ -377,15 +368,15 @@ body {
 }
 
 .btn-action:hover {
-  background: var(--bg-card-hover);
-  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-main);
   border-color: var(--border-focus);
   transform: translateY(-1px);
 }
 
 /* THEME PICKER BUTTON */
 .btn-theme {
-  background: rgba(99, 102, 241, 0.1);
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border);
   color: var(--text-main);
   padding: 6px 11px;
@@ -400,15 +391,15 @@ body {
 }
 
 .btn-theme:hover {
-  background: var(--bg-card-hover);
+  background: rgba(255, 255, 255, 0.08);
   border-color: var(--primary);
   transform: translateY(-1px);
 }
 
 /* UPDATE BUTTON */
 .btn-update {
-  background: rgba(99, 102, 241, 0.12);
-  border: 1px solid rgba(99, 102, 241, 0.35);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
   color: var(--primary);
   padding: 6px 11px;
   border-radius: 8px;
@@ -423,14 +414,14 @@ body {
 }
 
 .btn-update:hover {
-  background: rgba(99, 102, 241, 0.25);
+  background: rgba(99, 102, 241, 0.2);
   color: #fff;
   border-color: var(--primary);
   transform: translateY(-1px);
 }
 
 .btn-update.has-update {
-  background: rgba(16, 185, 129, 0.2);
+  background: rgba(16, 185, 129, 0.15);
   border-color: var(--accent);
   color: var(--accent);
 }
@@ -457,6 +448,7 @@ body {
   display: grid;
   grid-template-columns: 320px 1fr 290px;
   overflow: hidden;
+  background-color: var(--bg-dark);
 }
 
 /* ==========================================================================
@@ -464,7 +456,7 @@ body {
    ========================================================================== */
 
 .sidebar-left {
-  background: var(--bg-panel);
+  background-color: var(--bg-panel);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
@@ -486,7 +478,7 @@ body {
 
 .snippet-actions-bar {
   padding: 10px 14px;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.25);
   border-bottom: 1px solid var(--border);
   display: flex;
   gap: 8px;
@@ -494,9 +486,9 @@ body {
 
 .btn-save-selection {
   flex: 1;
-  background: rgba(99, 102, 241, 0.15);
-  border: 1px solid rgba(99, 102, 241, 0.4);
-  color: #c7d2fe;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  color: var(--text-main);
   padding: 8px 12px;
   border-radius: 7px;
   font-size: 11px;
@@ -596,7 +588,7 @@ body {
   font-family: 'Fira Code', monospace;
   font-size: 11px;
   color: var(--text-muted);
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.4);
   padding: 6px 8px;
   border-radius: 5px;
   border: 1px solid var(--border);
@@ -614,7 +606,7 @@ body {
 }
 
 .btn-insert-snippet {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border);
   color: var(--accent);
   padding: 5px 8px;
@@ -642,7 +634,7 @@ body {
 .center-editor-container {
   display: flex;
   flex-direction: column;
-  background: rgba(0, 0, 0, 0.25);
+  background-color: var(--bg-dark);
   overflow: hidden;
   position: relative;
 }
@@ -720,7 +712,7 @@ body {
    ========================================================================== */
 
 .sidebar-right {
-  background: var(--bg-panel);
+  background-color: var(--bg-panel);
   border-left: 1px solid var(--border);
   display: flex;
   flex-direction: column;
@@ -738,7 +730,7 @@ body {
 #oscilloscope {
   width: 100%;
   height: 110px;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.45);
   border-radius: 8px;
   border: 1px solid var(--border);
 }
@@ -854,8 +846,8 @@ body {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
   display: none;
   align-items: center;
   justify-content: center;
@@ -867,13 +859,13 @@ body {
 }
 
 .modal-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-focus);
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
   border-radius: 12px;
-  width: 480px;
+  width: 500px;
   max-width: 90vw;
   padding: 22px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -935,6 +927,16 @@ body {
 
 .modal-textarea:focus {
   border-color: var(--border-focus);
+}
+
+.repo-badge {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-family: 'Fira Code', monospace;
+  color: var(--accent);
 }
 
 .changelog-box {
