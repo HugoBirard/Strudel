@@ -1,0 +1,536 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=2cm]{geometry}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{tabularx}
+\usepackage{amsmath}
+\usepackage{array}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!70!black,
+    urlcolor=blue!70!black,
+    citecolor=blue!70!black,
+    pdftitle={Strudel Studio - Manuel Utilisateur et Guide Complet},
+    pdfauthor={Hugo Birard}
+}
+
+\definecolor{codegray}{gray}{0.95}
+\definecolor{primary}{RGB}{99, 102, 241}
+\definecolor{accent}{RGB}{16, 185, 129}
+\definecolor{darkbg}{RGB}{15, 23, 42}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    {\Huge \textbf{\color{primary} STRUDEL STUDIO}}\\[0.5cm]
+    {\Large \textbf{Application Desktop Dédiée au Live-Coding Musical}}\\[0.3cm]
+    {\large Manuel Officiel d'Utilisation \& Guide de Référence Exhaustif}\\[1.5cm]
+
+    \rule{\linewidth}{0.5mm}\\[0.4cm]
+    {\large \textbf{Auteur :}} Hugo Birard\\
+    {\large \textbf{Moteur Audio :}} Strudel / TidalCycles WebAudio Architecture\\
+    {\large \textbf{Version :}} 2.0 (Architecture Modulaire \& CodeMirror 6)\\[0.4cm]
+    \rule{\linewidth}{0.5mm}\\[2cm]
+
+    \begin{quote}
+    \centering
+    \textit{Un environnement de live-coding sans compromis : interface sombre sur-mesure, bus matériel WebAudio réel, éditeur professionnel à coloration syntaxique, métronome zero-drift et bibliothèque personnelle de snippets.}
+    \end{quote}
+
+    \vfill
+    {\large Novembre 2026}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\section{Introduction \& Philosophie}
+\textbf{Strudel Studio} est une application pour ordinateur de bureau (Linux, macOS, Windows) conçue pour la création musicale algorithmique en temps réel. Elle intègre le moteur de synthèse et de séquençage de \textbf{Strudel} (implémentation JavaScript de \textbf{TidalCycles}), tout en remplaçant l'interface web par défaut par un studio de production épuré, sombre, modulaire et hautement performant.
+
+\subsection{Principes Directeurs}
+\begin{enumerate}
+    \item \textbf{Zéro code imposé :} L'éditeur s'ouvre vierge, sans aucun exemple pré-rempli. Vous démarrez toujours d'une page blanche.
+    \item \textbf{Flux matériel réel :} Les curseurs de réglage (Volume Master, Filtre Passe-Bas Master) sont physiquement connectés au graphe de traitement WebAudio natif.
+    \item \textbf{Édition professionnelle :} Intégration officielle de l'éditeur \textbf{CodeMirror 6} avec coloration syntaxique complète du langage Strudel et de la mini-notation Tidal.
+    \item \textbf{Synchronisation parfaite :} Asservissement de l'affichage métrique sur l'horloge interne de Strudel pour éliminer toute dérive temporelle.
+    \item \textbf{Liberté totale :} Bibliothèque de snippets personnalisée persistante dans le stockage local de l'utilisateur.
+\end{enumerate}
+
+\section{Guide d'Installation \& Lancement}
+
+\subsection{Prérequis Système}
+\begin{itemize}
+    \item \textbf{Système d'exploitation :} Linux (Ubuntu, Debian, Fedora, Arch, etc.), Windows 10/11 ou macOS.
+    \item \textbf{Node.js :} Version 18 ou supérieure recommandée (\texttt{node -v}).
+    \item \textbf{Gestionnaire de paquets :} npm ou pnpm.
+    \item \textbf{Carte son \& Pilotes WebAudio :} Compatible ALSA, PulseAudio ou PipeWire sous Linux.
+\end{itemize}
+
+\subsection{Installation depuis le Dépôt Git}
+Ouvrez un terminal et exécutez les commandes suivantes :
+\begin{verbatim}
+# 1. Cloner le dépôt officiel
+git clone git@github.com:HugoBirard/Strudel.git
+cd Strudel
+
+# 2. Installer les dépendances du projet
+npm install
+
+# 3. Lancer l'application
+npm start
+\end{verbatim}
+
+\subsection{Installation du Raccourci Système (Bureau \& Menu d'applications)}
+Pour lancer Strudel Studio en un clic sans ouvrir de terminal, exécutez le script d'installation du raccourci :
+\begin{verbatim}
+npm run install-shortcut
+# ou directement :
+bash scripts/install-shortcut.sh
+\end{verbatim}
+Ce script crée une entrée de bureau sur votre \textbf{Bureau} (\texttt{\textasciitilde/Desktop} ou \texttt{\textasciitilde/Bureau}) ainsi que dans votre lanceur d'applications Linux (\texttt{\textasciitilde/.local/share/applications/strudel-studio.desktop}).
+
+\subsection{Compilation d'un Binaire Autonome (AppImage Linux)}
+Pour packager l'application sous la forme d'un exécutable unique transportable sans nécessiter Node.js :
+\begin{verbatim}
+npm run build:linux
+\end{verbatim}
+Le fichier généré sera disponible dans le répertoire \texttt{dist/} sous le nom \texttt{Strudel Studio-1.0.0.AppImage}.
+
+\newpage
+
+\section{Visite Guidée de l'Interface Utilisateur}
+L'interface de Strudel Studio est organisée en 4 zones distinctes conçues pour le confort visuel et l'efficacité lors de sessions prolongées.
+
+\subsection{1. Barre Supérieure (Barre de Transport \& Système)}
+La barre supérieure arbore un style glassmorphism élégant calé sur le fond sombre :
+\begin{itemize}
+    \item \textbf{Bouton PLAY (\texttt{Ctrl + Entrée}) :} Lance l'évaluation du code en cours dans l'éditeur. Réveille instantanément l'AudioContext en cas de restriction d'autoplay du système d'exploitation.
+    \item \textbf{Bouton STOP (\texttt{Ctrl + .}) :} Coupe immédiatement tous les cycles sonores et libère les oscillateurs actifs.
+    \item \textbf{Métronome Visuel 4 Temps (Zero-Drift) :} 4 diodes lumineuses indiquent en temps réel les pulsations du cycle rythmique. Contrairement aux métronomes classiques utilisant des timers JavaScript décalés, ce métronome est directement asservi à l'horloge haute précision de Strudel (\texttt{repl.scheduler.now()}).
+    \item \textbf{Contrôleur de Tempo (BPM) \& TAP :} Permet d'ajuster le tempo à la volée avec les boutons $+$ / $-$, par saisie numérique ou en battant la mesure sur le bouton \textbf{TAP}.
+    \item \textbf{Bouton Thème :} Ouvre un panneau permettant de basculer instantanément entre 6 thèmes d'interface personnalisés.
+    \item \textbf{Boutons Fichier (Nouveau, Ouvrir, Sauvegarder) :} Permettent de gérer vos fichiers de patterns musicaux locaux (\texttt{.strudel}, \texttt{.js}).
+    \item \textbf{Bouton Mises à Jour :} Vérifie la disponibilité de nouveaux commits sur le dépôt GitHub officiel \texttt{HugoBirard/Strudel} et permet l'installation en un clic.
+\end{itemize}
+
+\subsection{2. Panneau Gauche (Bibliothèque Personnelle de Snippets)}
+Ce panneau vous permet d'enregistrer vos motifs musicaux, progressions d'accords et effets favoris pour les réutiliser d'un simple clic :
+\begin{itemize}
+    \item \textbf{Insertion chirurgicale au curseur :} Cliquer sur \textit{"Insérer au curseur"} injecte exactement le code à l'emplacement actif du curseur dans l'éditeur, sans ajouter de saut de ligne parasite.
+    \item \textbf{Bouton "Sauvegarder la sélection" :} Sélectionnez une portion de texte dans l'éditeur à la souris et cliquez sur ce bouton pour créer un nouveau snippet pré-rempli.
+    \item \textbf{Persistance locale :} Vos snippets sont conservés dans le stockage local de votre machine d'une session à l'autre.
+\end{itemize}
+
+\subsection{3. Panneau Central (Éditeur Professionnel CodeMirror 6)}
+Le cœur de travail de l'application bénéficie de toute la puissance de CodeMirror 6 :
+\begin{itemize}
+    \item \textbf{Coloration syntaxique complète :} Reconnaissance native des fonctions Strudel (\texttt{s}, \texttt{note}, \texttt{stack}, \texttt{cpm}), de la mini-notation TidalCycles (crochets, chevrons, alternances, accélérations), des variables et des nombres.
+    \item \textbf{Auto-fermeture :} Fermeture automatique des parenthèses, crochets, accolades et guillemets.
+    \item \textbf{Indentation automatique :} Gestion intelligente de la touche Tabulation.
+    \item \textbf{Barre de statut dynamique :} Affiche en temps réel si le moteur audio est à l'arrêt, en cours d'évaluation, ou si une erreur de syntaxe a été détectée dans le code.
+\end{itemize}
+
+\subsection{4. Panneau Droit (Visualisateur Audio \& Bus Matériel)}
+\begin{itemize}
+    \item \textbf{Visualisateur Audio Réactif 60 FPS :}
+    \begin{itemize}
+        \item \textit{Oscilloscope temporel :} Tracé d'onde illuminé réagissant directement aux formes d'ondes générées (dents de scie, sinus, impulsions).
+        \item \textit{Spectre fréquentiel FFT :} Barres d'analyse spectrale animées en arrière-plan révélant la répartition des fréquences basses, médiums et aiguës.
+    \end{itemize}
+    \item \textbf{Curseur Master Cutoff (Filtre LPF) :} Contrôle en temps réel la fréquence de coupure d'un filtre physique \texttt{BiquadFilterNode} placé sur le bus master (plage : 200 Hz à 20000 Hz).
+    \item \textbf{Curseur Résonance (Q) :} Ajuste le facteur de qualité (résonance) du filtre passe-bas master.
+    \item \textbf{Curseur Reverb (macroRoom) :} Variable globale de diffusion spatiale utilisable dans vos morceaux.
+    \item \textbf{Curseur Volume Général :} Contrôle le gain matériel final (\texttt{GainNode}) sans distorsion numérique.
+\end{itemize}
+
+\newpage
+
+\section{Guide Musical Pas-à-Pas pour Débutants}
+La composition musicale en live-coding s'articule traditionnellement autour de couches superposées grâce à la fonction \texttt{stack()}. Voici l'ordre recommandé pour construire un morceau cohérent :
+
+\subsection{Étape 1 : Le Rythme (Batterie \& Percussions)}
+Le rythme pose l'assise du morceau. On utilise la fonction \texttt{s()} avec une banque de sons telle que la Roland TR-808 :
+\begin{verbatim}
+s("bd [~ bd] sd [~ cp]")
+  .bank("RolandTR808")
+\end{verbatim}
+
+\subsection{Étape 2 : La Ligne de Basse (Bassline)}
+La basse ancre l'harmonie et dialogue avec la grosse caisse (\textit{kick}) :
+\begin{verbatim}
+s("sawtooth")
+  .note("<c2 [c2 eb2] g2 bb1>")
+  .lpf(800)
+  .decay(0.2)
+  .sustain(0.1)
+\end{verbatim}
+
+\subsection{Étape 3 : L'Harmonie (Accords \& Nappes)}
+Les accords installent l'émotion et l'atmosphère générale du morceau :
+\begin{verbatim}
+s("gm_electric_piano_1")
+  .chord("<Cm7!2 Fm7 G7>")
+  .room(0.5)
+  .gain(0.7)
+\end{verbatim}
+
+\subsection{Étape 4 : Le Motif Mélodique ou Arpège}
+Une mélodie rapide ou un arpège donne du mouvement :
+\begin{verbatim}
+s("triangle")
+  .note("c4 eb4 g4 bb4 c5 bb4 g4 eb4")
+  .fast(2)
+  .decay(0.12)
+  .sustain(0.02)
+  .delay(0.3)
+\end{verbatim}
+
+\subsection{Étape 5 : L'Assemblage Complet avec \texttt{stack()}}
+On rassemble l'ensemble des pistes au sein d'un seul bloc exécutable :
+\begin{verbatim}
+stack(
+  // Piste 1 : Percussions
+  s("bd [~ bd] [sd,cp] [~ bd]").bank("RolandTR808"),
+  s("hh*8").bank("RolandTR808").gain(0.6),
+
+  // Piste 2 : Basse
+  s("sawtooth").note("<c2 [c2 eb2] g2 bb1>").lpf(1000).decay(0.18),
+
+  // Piste 3 : Accords
+  s("gm_electric_piano_1").chord("<Cm7!2 Fm7 G7>").room(0.4).gain(0.65),
+
+  // Piste 4 : Arpège
+  s("sine").note("c4 eb4 g4 c5").fast(4).decay(0.08).gain(0.5)
+)
+\end{verbatim}
+
+\newpage
+
+\section{Catalogue Exhaustif des 128 Instruments General MIDI}
+Strudel intègre l'ensemble de la norme General MIDI. Pour jouer un instrument, utilisez la syntaxe :\\
+\texttt{s("gm\_nom\_instrument").note("c3 e3 g3")}
+
+\subsection{Pianos (0--7)}
+\begin{tabularx}{\linewidth}{|l|X|}
+\hline
+\textbf{Nom Strudel} & \textbf{Description} \\
+\hline
+\texttt{gm\_acoustic\_grand\_piano} & Grand piano acoustique de concert \\
+\texttt{gm\_bright\_acoustic\_piano} & Piano acoustique brillant \\
+\texttt{gm\_electric\_grand\_piano} & Grand piano électrique CP-70 \\
+\texttt{gm\_honky\_tonk\_piano} & Piano désaccordé de saloon \\
+\texttt{gm\_electric\_piano\_1} & Piano électrique Rhodes \\
+\texttt{gm\_electric\_piano\_2} & Piano électrique FM type DX7 \\
+\texttt{gm\_harpsichord} & Clavecin baroque \\
+\texttt{gm\_clavinet} & Clavinet funky \\
+\hline
+\end{tabularx}
+
+\subsection{Percussions Chromatiques (8--15)}
+\begin{tabularx}{\linewidth}{|l|X|}
+\hline
+\textbf{Nom Strudel} & \textbf{Description} \\
+\hline
+\texttt{gm\_celesta} & Célesta féérique \\
+\texttt{gm\_glockenspiel} & Glockenspiel métallique \\
+\texttt{gm\_music\_box} & Boîte à musique mécanique \\
+\texttt{gm\_vibraphone} & Vibraphone de jazz avec trémolo \\
+\texttt{gm\_marimba} & Marimba en bois chaud \\
+\texttt{gm\_xylophone} & Xylophone percutant \\
+\texttt{gm\_tubular\_bells} & Cloches tubulaires d'orchestre \\
+\texttt{gm\_dulcimer} & Tympanon traditionnel \\
+\hline
+\end{tabularx}
+
+\subsection{Orgues (16--23)}
+\begin{tabularx}{\linewidth}{|l|X|}
+\hline
+\textbf{Nom Strudel} & \textbf{Description} \\
+\hline
+\texttt{gm\_drawbar\_organ} & Orgue Hammond B3 \\
+\texttt{gm\_percussive\_organ} & Orgue percussif gospel / jazz \\
+\texttt{gm\_rock\_organ} & Orgue rock saturé \\
+\texttt{gm\_church\_organ} & Grand orgue d'église \\
+\texttt{gm\_reed\_organ} & Harmonium / orgue à anches \\
+\texttt{gm\_accordion} & Accordéon musette \\
+\texttt{gm\_harmonica} & Harmonica blues \\
+\texttt{gm\_tango\_accordion} & Bandoneon de tango \\
+\hline
+\end{tabularx}
+
+\subsection{Guitares (24--31)}
+\begin{tabularx}{\linewidth}{|l|X|}
+\hline
+\textbf{Nom Strudel} & \textbf{Description} \\
+\hline
+\texttt{gm\_acoustic\_guitar\_nylon} & Guitare classique cordes nylon \\
+\texttt{gm\_acoustic\_guitar\_steel} & Guitare folk cordes acier \\
+\texttt{gm\_electric\_guitar\_jazz} & Guitare demi-caisse jazz \\
+\texttt{gm\_electric\_guitar\_clean} & Guitare électrique claire (Stratocaster) \\
+\texttt{gm\_electric\_guitar\_muted} & Guitare étouffée (Palm-mute) \\
+\texttt{gm\_overdriven\_guitar} & Guitare rock avec overdrive \\
+\texttt{gm\_distortion\_guitar} & Guitare métal avec distorsion lourde \\
+\texttt{gm\_guitar\_harmonics} & Harmoniques de guitare \\
+\hline
+\end{tabularx}
+
+\subsection{Basses (32--39)}
+\begin{tabularx}{\linewidth}{|l|X|}
+\hline
+\textbf{Nom Strudel} & \textbf{Description} \\
+\hline
+\texttt{gm\_acoustic\_bass} & Contrebasse acoustique jazz \\
+\texttt{gm\_electric\_bass\_finger} & Basse électrique jouée aux doigts \\
+\texttt{gm\_electric\_bass\_pick} & Basse électrique jouée au médiator \\
+\texttt{gm\_fretless\_bass} & Basse fretless fluide \\
+\texttt{gm\_slap\_bass\_1} & Basse slap funk percutante \\
+\texttt{gm\_slap\_bass\_2} & Basse slap avec claquement marqué \\
+\texttt{gm\_synth\_bass\_1} & Basse synthé analogique classique \\
+\texttt{gm\_synth\_bass\_2} & Basse synthé moderne agressive \\
+\hline
+\end{tabularx}
+
+\subsection{Cordes \& Orchestre (40--55)}
+\begin{tabularx}{\linewidth}{|l|X|}
+\hline
+\textbf{Nom Strudel} & \textbf{Description} \\
+\hline
+\texttt{gm\_violin} & Violon solo \\
+\texttt{gm\_viola} & Alto solo \\
+\texttt{gm\_cello} & Violoncelle chaleureux \\
+\texttt{gm\_contrabass} & Contrebasse à l'archet \\
+\texttt{gm\_tremolo\_strings} & Ensemble de cordes en trémolo \\
+\texttt{gm\_pizzicato\_strings} & Cordes jouées en pizzicato \\
+\texttt{gm\_orchestral\_harp} & Harpe de concert \\
+\texttt{gm\_timpani} & Timbales orchestrales \\
+\texttt{gm\_string\_ensemble\_1} & Ensemble de cordes symphoniques \\
+\texttt{gm\_string\_ensemble\_2} & Ensemble de cordes lentes (Slow strings) \\
+\texttt{gm\_synth\_strings\_1} & Nappe de cordes synthé analogique \\
+\texttt{gm\_synth\_strings\_2} & Nappe de cordes synthé douce \\
+\texttt{gm\_choir\_aahs} & Chœur vocal classique (Aahs) \\
+\texttt{gm\_voice\_oohs} & Chœur vocal doux (Oohs) \\
+\texttt{gm\_synth\_voice} & Voix synthétisée vocoder \\
+\texttt{gm\_orchestra\_hit} & Coup orchestral dramatique \\
+\hline
+\end{tabularx}
+
+\subsection{Cuivres (Brass) (56--63)}
+\begin{tabularx}{\linewidth}{|l|X|}
+\hline
+\textbf{Nom Strudel} & \textbf{Description} \\
+\hline
+\texttt{gm\_trumpet} & Trompette éclatante \\
+\texttt{gm\_trombone} & Trombone à coulisse \\
+\texttt{gm\_tuba} & Tuba puissant \\
+\texttt{gm\_muted\_trumpet} & Trompette avec sourdine jazz \\
+\texttt{gm\_french\_horn} & Cor d'harmonie symphonique \\
+\texttt{gm\_brass\_section} & Section complète de cuivres cuivrés \\
+\texttt{gm\_synth\_brass\_1} & Cuivres synthétiques 80s (Jump style) \\
+\texttt{gm\_synth\_brass\_2} & Cuivres synthétiques tranchants \\
+\hline
+\end{tabularx}
+
+\subsection{Bois (Reed \& Pipe) (64--79)}
+\begin{tabularx}{\linewidth}{|l|X|}
+\hline
+\textbf{Nom Strudel} & \textbf{Description} \\
+\hline
+\texttt{gm\_soprano\_sax} & Saxophone soprano \\
+\texttt{gm\_alto\_sax} & Saxophone alto expressif \\
+\texttt{gm\_tenor\_sax} & Saxophone ténor chaud \\
+\texttt{gm\_baritone\_sax} & Saxophone baryton grave \\
+\texttt{gm\_oboe} & Hautbois pastoral \\
+\texttt{gm\_english\_horn} & Cor anglais mélancolique \\
+\texttt{gm\_bassoon} & Basson orchestral \\
+\texttt{gm\_clarinet} & Clarinette classique \\
+\texttt{gm\_piccolo} & Petite flûte piccolo aiguë \\
+\texttt{gm\_flute} & Grande flûte traversière \\
+\texttt{gm\_recorder} & Flûte à bec \\
+\texttt{gm\_pan\_flute} & Flûte de Pan \\
+\texttt{gm\_blown\_bottle} & Son de bouteille soufflée \\
+\texttt{gm\_shakuhachi} & Flûte traditionnelle japonaise \\
+\texttt{gm\_whistle} & Sifflet aigu \\
+\texttt{gm\_ocarina} & Ocarina en terre cuite \\
+\hline
+\end{tabularx}
+
+\subsection{Synth Leads (80--87) \& Synth Pads (88--95)}
+\begin{tabularx}{\linewidth}{|l|X|}
+\hline
+\textbf{Nom Strudel} & \textbf{Description} \\
+\hline
+\texttt{gm\_lead\_1\_square} & Lead onde carrée classique chiptune \\
+\texttt{gm\_lead\_2\_sawtooth} & Lead onde dent de scie tranchant \\
+\texttt{gm\_lead\_3\_calliope} & Lead vapeur rétro calliope \\
+\texttt{gm\_lead\_4\_chiff} & Lead percutant avec souffle \\
+\texttt{gm\_lead\_5\_charang} & Lead guitare synthétique moderne \\
+\texttt{gm\_lead\_6\_voice} & Lead vocal chantant \\
+\texttt{gm\_lead\_7\_fifths} & Lead avec quinte intégrée \\
+\texttt{gm\_lead\_8\_bass\_and\_lead} & Lead puissant doublé à l'octave \\
+\texttt{gm\_pad\_1\_new\_age} & Nappe new age planante \\
+\texttt{gm\_pad\_2\_warm} & Nappe analogique chaude \\
+\texttt{gm\_pad\_3\_polysynth} & Nappe polysynthé classique \\
+\texttt{gm\_pad\_4\_choir} & Nappe de chœur céleste \\
+\texttt{gm\_pad\_5\_bowed} & Nappe de cordes frottées \\
+\texttt{gm\_pad\_6\_metallic} & Nappe aux reflets métalliques \\
+\texttt{gm\_pad\_7\_halo} & Nappe lumineuse avec halo résonant \\
+\texttt{gm\_pad\_8\_sweep} & Nappe avec balayage de filtre lent \\
+\hline
+\end{tabularx}
+
+\subsection{Synth FX \& World (96--111)}
+\begin{tabularx}{\linewidth}{|l|X|}
+\hline
+\textbf{Nom Strudel} & \textbf{Description} \\
+\hline
+\texttt{gm\_fx\_1\_rain} & Effet sonore d'averse \\
+\texttt{gm\_fx\_2\_soundtrack} & Son d'ambiance cinématographique \\
+\texttt{gm\_fx\_3\_crystal} & Cristaux carillonnants scintillants \\
+\texttt{gm\_fx\_4\_atmosphere} & Nappe de science-fiction spatiale \\
+\texttt{gm\_fx\_5\_brightness} & Sonorité lumineuse riche en harmoniques \\
+\texttt{gm\_fx\_6\_goblins} & Effet mystérieux et fantastique \\
+\texttt{gm\_fx\_7\_echoes} & Sons avec échos multiples \\
+\texttt{gm\_fx\_8\_sci\_fi} & Sons de vaisseaux et technologies SF \\
+\texttt{gm\_sitar} & Cithare indienne traditionnelle \\
+\texttt{gm\_banjo} & Banjo américain country \\
+\texttt{gm\_shamisen} & Luth japonais trois cordes \\
+\texttt{gm\_koto} & Harpe japonaise à chevalets mobiles \\
+\texttt{gm\_kalimba} & Piano à pouces africain \\
+\texttt{gm\_bag\_pipe} & Cornemuse écossaise \\
+\texttt{gm\_fiddle} & Violon traditionnel folk \\
+\texttt{gm\_shanai} & Hautbois indien festif \\
+\hline
+\end{tabularx}
+
+\subsection{Percussions \& Sons Spéciaux (112--127)}
+\begin{tabularx}{\linewidth}{|l|X|}
+\hline
+\textbf{Nom Strudel} & \textbf{Description} \\
+\hline
+\texttt{gm\_tinkle\_bell} & Clochette tintante \\
+\texttt{gm\_agogo} & Cloches agogô brésiliennes \\
+\texttt{gm\_steel\_drums} & Steel drum caribéen (Pans) \\
+\texttt{gm\_woodblock} & Bloc de bois sec \\
+\texttt{gm\_taiko\_drum} & Gros tambour taiko japonais \\
+\texttt{gm\_melodic\_tom} & Tom de batterie mélodique accordable \\
+\texttt{gm\_synth\_drum} & Tambour synthétique électronique 80s \\
+\texttt{gm\_reverse\_cymbal} & Cymbale inversée de transition \\
+\texttt{gm\_guitar\_fret\_noise} & Bruit de frette et frottement de corde \\
+\texttt{gm\_breath\_noise} & Bruit d'aspiration et de souffle humain \\
+\texttt{gm\_seashore} & Vagues et ressenti de bord de mer \\
+\texttt{gm\_bird\_tweet} & Gazouillis d'oiseaux dans la nature \\
+\texttt{gm\_telephone\_ring} & Sonnerie de téléphone vintage \\
+\texttt{gm\_helicopter} & Bruit de pales d'hélicoptère \\
+\texttt{gm\_applause} & Applaudissements et acclamations de foule \\
+\texttt{gm\_gunshot} & Coup de feu sec et retentissant \\
+\hline
+\end{tabularx}
+
+\newpage
+
+\section{Banques de Percussions \& Synthétiseurs}
+
+\subsection{Banques de Boîtes à Rythmes Disponibles}
+Appliquez une banque avec \texttt{.bank("NomBanque")} :
+\begin{itemize}
+    \item \texttt{RolandTR808} : Le son intemporel du hip-hop, de la trap et de l'électro (grosses basses 808, claps distinctifs, cowbells).
+    \item \texttt{RolandTR909} : La référence de la techno et de la house music (kick percutant, charlestons ouverts ouverts et caisses claires claquantes).
+    \item \texttt{RolandTR707} : Sons numériques 12-bit typiques de la synthwave et de la pop des années 80.
+    \item \texttt{LinnDrum} : La boîte à rythmes mythique utilisée par Prince, Michael Jackson et New Order.
+    \item \texttt{AkaiMPC60} : Percussions hip-hop old school chaleureuses avec grain vintage.
+\end{itemize}
+
+\subsection{Noms des Éléments de Batterie (Drum Hits)}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Symbole} & \textbf{Élément} \\
+\hline
+\texttt{bd} & Bass Drum / Kick (Grosse caisse) \\
+\texttt{sd} & Snare Drum (Caisse claire) \\
+\texttt{hh} & Closed Hi-Hat (Charleston fermé) \\
+\texttt{oh} & Open Hi-Hat (Charleston ouvert) \\
+\texttt{cp} & Clap (Claquement de mains) \\
+\texttt{cb} & Cowbell (Cloche à vache) \\
+\texttt{rim} & Rimshot (Frappe sur le cercle) \\
+\texttt{cr} & Crash Cymbal (Cymbale crash) \\
+\texttt{rd} & Ride Cymbal (Cymbale ride) \\
+\texttt{ht}, \texttt{mt}, \texttt{lt} & High, Mid, Low Toms \\
+\hline
+\end{tabular}
+
+\subsection{Synthétiseurs Superdough Internes (100\% Hors-Ligne)}
+Ces générateurs d'ondes fonctionnent immédiatement sans nécessiter aucun téléchargement de samples :
+\begin{itemize}
+    \item \texttt{s("sawtooth")} : Onde en dent de scie riche en harmoniques, idéale pour les basses techno et les leads saturés.
+    \item \texttt{s("square")} : Onde carrée creuse et percutante, base des sons chiptune 8-bit et orgues d'arcade.
+    \item \texttt{s("triangle")} : Onde triangulaire douce et pure, parfaite pour les mélodies cristallines et les flûtes synthétiques.
+    \item \texttt{s("sine")} : Onde sinusoïdale pure sans aucune harmonique, base des sub-basses profondes.
+\end{itemize}
+
+\section{Guide des Effets Audio \& Filtres}
+Tous les effets peuvent être chaînés en fin de pattern :
+
+\begin{tabularx}{\linewidth}{|l|l|X|}
+\hline
+\textbf{Méthode} & \textbf{Valeurs types} & \textbf{Description} \\
+\hline
+\texttt{.lpf(freq)} & \texttt{100} à \texttt{18000} & Filtre Passe-Bas : atténue les fréquences supérieures \\
+\texttt{.lpq(q)} & \texttt{1} à \texttt{15} & Résonance du filtre passe-bas \\
+\texttt{.hpf(freq)} & \texttt{100} à \texttt{8000} & Filtre Passe-Haut : coupe les sous-basses indésirables \\
+\texttt{.decay(sec)} & \texttt{0.05} à \texttt{2.0} & Vitesse d'extinction de la note après l'attaque \\
+\texttt{.sustain(val)} & \texttt{0.0} à \texttt{1.0} & Niveau de volume maintenu tant que la note est active \\
+\texttt{.gain(val)} & \texttt{0.0} à \texttt{1.2} & Ajustement individuel du volume de la piste \\
+\texttt{.pan(val)} & \texttt{0.0} (G) à \texttt{1.0} (D) & Positionnement stéréophonique gauche / droite \\
+\texttt{.room(val)} & \texttt{0.0} à \texttt{1.0} & Quantité de réverbération et d'espace acoustique \\
+\texttt{.delay(val)} & \texttt{0.0} à \texttt{1.0} & Quantité d'écho et de répétition temporelle \\
+\texttt{.delaytime(val)} & \texttt{0.125} à \texttt{0.5} & Temps de décalage de l'écho en fractions de cycle \\
+\texttt{.shape(val)} & \texttt{0.0} à \texttt{0.9} & Saturation et distorsion harmonique chaleureuse \\
+\texttt{.crush(bits)} & \texttt{4} à \texttt{12} & Réduction de bits numérique (Bitcrusher rétro) \\
+\hline
+\end{tabularx}
+
+\newpage
+
+\section{Guide de la Mini-Notation Rythmique TidalCycles}
+La mini-notation permet d'écrire des rythmes extrêmement complexes et polyrythmiques en quelques caractères :
+
+\begin{tabularx}{\linewidth}{|l|l|X|}
+\hline
+\textbf{Opérateur} & \textbf{Exemple} & \textbf{Signification} \\
+\hline
+\textbf{Espace} & \texttt{"c3 e3 g3"} & Joue les notes en succession équitable dans le cycle \\
+\textbf{Crochets \texttt{[]}} & \texttt{"[bd sd]"} & Regroupe plusieurs événements dans la durée d'un seul temps \\
+\textbf{Tilde \texttt{\~}} & \texttt{"[\~{} sd]"} & Silence (pause) d'une durée équivalente \\
+\textbf{Multiplication \texttt{*}} & \texttt{"hh*4"} & Répète la note 4 fois plus vite dans le même intervalle \\
+\textbf{Division \texttt{/}} & \texttt{"c3/2"} & Étire la note sur 2 cycles consécutifs \\
+\textbf{Virgule \texttt{,}} & \texttt{"[bd,hh*4]"} & Joue les éléments simultanément (polyphonie) \\
+\textbf{Chevrons \texttt{<>}} & \texttt{"<c3 f3 g3>"} & Alterne une note par cycle consécutif \\
+\textbf{Point d'exclamation \texttt{!}} & \texttt{"c3!3"} & Répète la même note 3 fois de suite \\
+\textbf{Point d'interrogation \texttt{?}} & \texttt{"hh?"} & Condition de probabilité (50\% de chance de se jouer) \\
+\textbf{Euclidien \texttt{(k,n)}} & \texttt{"bd(3,8)"} & Répartit équitablement 3 frappes sur 8 subdivisions temporelles \\
+\hline
+\end{tabularx}
+
+\section{Raccourcis Clavier Essentiels}
+\begin{itemize}
+    \item \texttt{Ctrl + Entrée} (ou \texttt{Cmd + Entrée}) : \textbf{Évaluer et Jouer} le code en direct.
+    \item \texttt{Ctrl + .} (ou \texttt{Cmd + .}) : \textbf{Arrêter immédiatement} le son (\textit{Hush}).
+    \item \texttt{Ctrl + S} (ou \texttt{Cmd + S}) : \textbf{Sauvegarder} le morceau dans un fichier local.
+    \item \texttt{Ctrl + Z} / \texttt{Ctrl + Y} : \textbf{Annuler / Rétablir} vos modifications dans l'éditeur.
+    \item \texttt{Tab} : Indentation automatique du code Strudel.
+\end{itemize}
+
+\vfill
+\begin{center}
+\small \textcopyright\ 2026 Hugo Birard — Strudel Studio Desktop. Licence Libre AGPL-3.0.
+\end{center}
+
+\end{document}
