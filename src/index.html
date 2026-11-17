@@ -157,7 +157,7 @@
       </div>
 
       <div class="editor-wrapper">
-        <textarea id="code-editor" spellcheck="false" placeholder="// Écrivez votre code Strudel ici..."></textarea>
+        <div id="code-editor-container" class="code-editor-container"></div>
       </div>
 
       <div class="editor-status-bar">
@@ -166,7 +166,7 @@
           <span id="status-text">Prêt (Arrêté)</span>
         </div>
         <div style="color: var(--text-muted); font-size: 11px;">
-          Moteur : WebAudio Headless Superdough
+          Moteur : Strudel WebAudio Master Bus (CodeMirror 6)
         </div>
       </div>
     </section>
@@ -187,7 +187,7 @@
       <!-- Macro Controls -->
       <div class="macros-card">
         <div class="panel-header" style="padding: 0 0 4px 0; border: none;">
-          <span>Macros en Direct</span>
+          <span>Contrôles Master & Effets</span>
           <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;">
             <circle cx="12" cy="12" r="3" />
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
@@ -197,19 +197,19 @@
         <!-- Macro 1 : Cutoff -->
         <div class="macro-control">
           <div class="macro-label">
-            <span>Cutoff Filtre (macroLPF)</span>
-            <span id="val-macroLPF">1200 Hz</span>
+            <span>Filtre Master (macroLPF)</span>
+            <span id="val-macroLPF">20000 Hz</span>
           </div>
-          <input type="range" id="slider-macroLPF" class="macro-slider" min="100" max="6000" value="1200">
+          <input type="range" id="slider-macroLPF" class="macro-slider" min="200" max="20000" step="100" value="20000">
         </div>
 
         <!-- Macro 2 : Resonance -->
         <div class="macro-control">
           <div class="macro-label">
             <span>Résonance (macroLPQ)</span>
-            <span id="val-macroLPQ">6.0</span>
+            <span id="val-macroLPQ">1.0</span>
           </div>
-          <input type="range" id="slider-macroLPQ" class="macro-slider" min="0.5" max="18" step="0.5" value="6">
+          <input type="range" id="slider-macroLPQ" class="macro-slider" min="0.5" max="15" step="0.5" value="1.0">
         </div>
 
         <!-- Macro 3 : Room -->

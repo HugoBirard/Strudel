@@ -1,3 +1,7 @@
+if (!process.env.XDG_RUNTIME_DIR || process.env.XDG_RUNTIME_DIR.startsWith('/run/user')) {
+  process.env.XDG_RUNTIME_DIR = '/tmp';
+}
+
 const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
@@ -8,19 +12,23 @@ const execFilePromise = util.promisify(execFile);
 let mainWindow;
 
 function createWindow() {
+  const isHeadless = process.argv.includes('--ozone-platform=headless') || process.env.HEADLESS_TEST === '1';
+  const iconPath = path.join(__dirname, '..', 'assets', 'icon.svg');
+
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
     minWidth: 1024,
     minHeight: 700,
+    show: !isHeadless,
     title: 'Strudel Studio',
     backgroundColor: '#0a0b10',
-    icon: path.join(__dirname, '..', 'assets', 'icon.svg'),
+    icon: isHeadless ? undefined : iconPath,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
       contextIsolation: true,
-      webSecurity: false, // Nécessaire pour WebAudio AudioWorklet (data: URI) et CORS sur samples distants
+      webSecurity: false,
       sandbox: false
     }
   });
@@ -40,12 +48,16 @@ function createWindow() {
     return { action: 'deny' };
   });
 
-  mainWindow.loadFile(path.join(__dirname, 'index.html'));
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
+    console.error(`[Renderer Load Error]: ${errorDescription} (${errorCode})`);
+  });
 
   // Affiche les logs du renderer dans le terminal pour déboguer
   mainWindow.webContents.on('console-message', (event, level, message, line, sourceId) => {
     console.log(`[Renderer]: ${message} (line ${line})`);
   });
+
+  mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
   mainWindow.on('closed', () => {
     mainWindow = null;
