@@ -148,7 +148,227 @@ body {
 }
 
 /* ==========================================================================
-   BARRE SYSTÈME / TRANSPORT (COULEUR EXACTE DU FOND, ZERO GRIS)
+   BARRE SYSTÈME NATIVE STYLE TODOLIST (GTK4 / MATCH-BG / GLASSMORPHISM)
+   ========================================================================== */
+
+.feather-icon {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2;
+  vertical-align: middle;
+  fill: none;
+  stroke: currentColor;
+  display: inline-block;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.system-titlebar {
+  height: 38px;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px 0 14px;
+  position: relative;
+  z-index: 50;
+  user-select: none;
+  -webkit-app-region: drag; /* Déplacement fluide de la fenêtre */
+  transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Éléments interactifs exemptés du drag */
+.system-titlebar button,
+.system-titlebar input,
+.system-titlebar a {
+  -webkit-app-region: no-drag;
+}
+
+/* 1. VARIATIONS DE STYLE DE LA BARRE SYSTÈME */
+
+/* A. Style Match-BG (défaut) : couleur exacte du fond avec fine bordure inférieure */
+.system-titlebar.titlebar-match-bg {
+  background-color: var(--bg-dark);
+  border-bottom: 1px solid var(--border);
+  box-shadow: none;
+}
+
+/* B. Style Glassmorphism : verre fumé translucide avec reflets */
+.system-titlebar.titlebar-glass {
+  background: linear-gradient(180deg, rgba(26, 31, 48, 0.95) 0%, rgba(12, 16, 28, 0.95) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
+}
+
+/* C. Style Néon Cyber Indigo : liseré lumineux avec halo néon */
+.system-titlebar.titlebar-neon {
+  background-color: var(--bg-dark);
+  border-bottom: 2px solid #6366f1;
+  box-shadow: 0 2px 14px rgba(99, 102, 241, 0.35);
+}
+
+/* D. Style Transparente : intégrée sans coupure */
+.system-titlebar.titlebar-transparent {
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: none;
+}
+
+/* E. Style Minimaliste : ultra-compacte */
+.system-titlebar.titlebar-minimal {
+  height: 28px;
+  min-height: 28px;
+  background-color: var(--bg-dark);
+  border-bottom: 1px solid var(--border);
+}
+.system-titlebar.titlebar-minimal .titlebar-title,
+.system-titlebar.titlebar-minimal .titlebar-badge,
+.system-titlebar.titlebar-minimal .titlebar-center {
+  display: none;
+}
+.system-titlebar.titlebar-minimal .win-btn {
+  width: 22px;
+  height: 22px;
+}
+
+/* 2. COMPOSANTS INTERNES DE LA TITLEBAR */
+
+.titlebar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.titlebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.titlebar-brand-icon {
+  background: #6366f1;
+  color: #fff;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.titlebar-brand-icon .feather-icon {
+  width: 12px;
+  height: 12px;
+  stroke-width: 2.5;
+}
+
+.titlebar-title {
+  color: rgba(255, 255, 255, 0.90);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.3px;
+}
+
+.titlebar-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(99, 102, 241, 0.15);
+  color: #818cf8;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  letter-spacing: 0.3px;
+}
+
+.titlebar-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.titlebar-status-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  display: inline-block;
+  animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.titlebar-status-text {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+.titlebar-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* BOUTONS DE CONTRÔLE DE FENÊTRE NATIVE STYLE GTK4 / TODOLIST */
+.win-btn {
+  background: rgba(255, 255, 255, 0.05);
+  color: #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.15s ease;
+}
+
+.win-btn .feather-icon {
+  width: 13px;
+  height: 13px;
+}
+
+.win-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
+}
+
+.win-btn:active {
+  transform: translateY(0);
+}
+
+.win-btn.win-btn-close:hover {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   BARRE DE TRANSPORT AUDIO (COULEUR EXACTE DU FOND, ZERO GRIS)
    ========================================================================== */
 
 .transport-bar {
@@ -875,6 +1095,133 @@ body {
 .theme-desc {
   font-size: 10px;
   color: var(--text-muted);
+}
+
+/* Grille et cartes d'options pour la barre de titre système (Style ToDoList) */
+.titlebar-style-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.titlebar-option-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.titlebar-option-btn:hover {
+  border-color: #6366f1;
+  background: rgba(99, 102, 241, 0.08);
+  transform: translateY(-1px);
+}
+
+.titlebar-option-btn.active {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px #6366f1;
+  background: rgba(99, 102, 241, 0.12);
+}
+
+.titlebar-preview {
+  width: 100%;
+  height: 24px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  font-size: 0.70rem;
+  font-weight: 600;
+  box-sizing: border-box;
+}
+
+.preview-dots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pdot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.pdot.red { background: #ef4444; }
+.pdot.yellow { background: #eab308; }
+.pdot.green { background: #10b981; }
+.pdot.gray { background: rgba(255, 255, 255, 0.35); }
+
+.preview-title {
+  font-size: 0.68rem;
+  letter-spacing: 0.3px;
+}
+
+.preview-title.minimal-hidden {
+  opacity: 0;
+}
+
+/* Styles spécifiques de miniature */
+.transparent-preview {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.match-preview {
+  background: #08090c;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.18);
+  color: #f1f5f9;
+}
+
+.glass-preview {
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  color: #ffffff;
+}
+
+.neon-preview {
+  background: #090a12;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-bottom: 2px solid #6366f1;
+  box-shadow: 0 2px 10px rgba(99, 102, 241, 0.4);
+  color: #a5b4fc;
+}
+
+.minimal-preview {
+  height: 18px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.titlebar-option-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.titlebar-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.titlebar-desc {
+  font-size: 10px;
+  color: var(--text-muted);
+  line-height: 1.3;
 }
 
 /* ==========================================================================

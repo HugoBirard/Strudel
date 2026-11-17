@@ -16,9 +16,10 @@ function createWindow() {
     height: 900,
     minWidth: 1024,
     minHeight: 700,
+    frame: false,
     show: !isHeadless,
     title: 'Strudel Studio',
-    backgroundColor: '#0a0b10',
+    backgroundColor: '#07080c',
     icon: isHeadless ? undefined : iconPath,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -27,6 +28,15 @@ function createWindow() {
       webSecurity: false,
       sandbox: false
     }
+  });
+
+  // Événements d'état de la fenêtre pour la synchronisation de l'icône maximiser/restaurer
+  mainWindow.on('maximize', () => {
+    mainWindow.webContents.send('window:maximize-change', true);
+  });
+
+  mainWindow.on('unmaximize', () => {
+    mainWindow.webContents.send('window:maximize-change', false);
   });
 
   // Protection Navigation : empêche l'injection d'URL distantes malveillantes
@@ -59,6 +69,29 @@ function createWindow() {
     mainWindow = null;
   });
 }
+
+// 0. GESTION DE LA FENÊTRE SYSTÈME (BARRE DE TITRE STYLE TODOLIST)
+ipcMain.on('window:minimize', () => {
+  if (mainWindow) mainWindow.minimize();
+});
+
+ipcMain.on('window:maximize', () => {
+  if (mainWindow) {
+    if (mainWindow.isMaximized()) {
+      mainWindow.unmaximize();
+    } else {
+      mainWindow.maximize();
+    }
+  }
+});
+
+ipcMain.on('window:close', () => {
+  if (mainWindow) mainWindow.close();
+});
+
+ipcMain.handle('window:isMaximized', () => {
+  return mainWindow ? mainWindow.isMaximized() : false;
+});
 
 // 1. DIALOGUES DE FICHIERS NATIFS SÉCURISÉS
 ipcMain.handle('dialog:openFile', async () => {

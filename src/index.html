@@ -7,6 +7,47 @@
 </head>
 <body class="theme-obsidian">
 
+  <!-- 0. BARRE SYSTÈME NATIVE STYLE TODOLIST (GTK4 CSD / MATCH-BG / GLASSMORPHISM) -->
+  <div class="system-titlebar titlebar-match-bg" id="system-titlebar">
+    <div class="titlebar-left">
+      <div class="titlebar-brand">
+        <span class="titlebar-brand-icon" title="Strudel Studio Desktop">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="feather-icon">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </span>
+        <span class="titlebar-title">Strudel Studio</span>
+        <span class="titlebar-badge">Desktop</span>
+      </div>
+    </div>
+
+    <div class="titlebar-center">
+      <div class="titlebar-status-box">
+        <span class="pulse-dot"></span>
+        <span class="titlebar-status-text" id="titlebar-status-text">Strudel Live-Coding Studio</span>
+      </div>
+    </div>
+
+    <div class="titlebar-right">
+      <button id="win-btn-minimize" class="win-btn" title="Réduire" aria-label="Réduire">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-icon">
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </button>
+      <button id="win-btn-maximize" class="win-btn" title="Agrandir en plein écran" aria-label="Agrandir">
+        <svg id="win-btn-max-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-icon">
+          <rect x="5" y="5" width="14" height="14" rx="2"/>
+        </svg>
+      </button>
+      <button id="win-btn-close" class="win-btn win-btn-close" title="Fermer" aria-label="Fermer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-icon">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
   <!-- 1. TOP TRANSPORT BAR (VISUEL PREMIUM GLASSMORPHISM) -->
   <header class="transport-bar">
     <!-- Brand -->
@@ -303,6 +344,89 @@
               <span class="theme-name">Retro Synthwave</span>
               <span class="theme-desc">Coucher de soleil orange 80s et magenta</span>
             </div>
+          </div>
+        </div>
+
+        <!-- STYLE DE LA BARRE SYSTÈME (GTK4 / LINUX / ELECTRON) STYLE TODOLIST -->
+        <div style="margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border);">
+          <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-main); letter-spacing: 0.5px; display: block; margin-bottom: 2px;">Style de la barre système (TitleBar)</label>
+          <span style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 10px;">Personnalisez la barre supérieure où s'affichent le titre et les boutons de contrôle de fenêtre :</span>
+          
+          <div class="titlebar-style-grid" id="titlebar-style-grid">
+            <button type="button" class="titlebar-option-btn active" data-titlebar="match-bg">
+              <div class="titlebar-preview match-preview">
+                <div class="preview-dots">
+                  <span class="pdot red"></span>
+                  <span class="pdot yellow"></span>
+                  <span class="pdot green"></span>
+                </div>
+                <span class="preview-title">Strudel Studio</span>
+              </div>
+              <div class="titlebar-option-content">
+                <span class="titlebar-name">Même couleur que le fond</span>
+                <span class="titlebar-desc">Fond uni sombre identique à l'application avec discrète bordure inférieure</span>
+              </div>
+            </button>
+
+            <button type="button" class="titlebar-option-btn" data-titlebar="glass">
+              <div class="titlebar-preview glass-preview">
+                <div class="preview-dots">
+                  <span class="pdot red"></span>
+                  <span class="pdot yellow"></span>
+                  <span class="pdot green"></span>
+                </div>
+                <span class="preview-title">Strudel Studio</span>
+              </div>
+              <div class="titlebar-option-content">
+                <span class="titlebar-name">Verre Fumé Glassmorphism</span>
+                <span class="titlebar-desc">Look premium translucide avec reflet métallique et ombre portée</span>
+              </div>
+            </button>
+
+            <button type="button" class="titlebar-option-btn" data-titlebar="neon">
+              <div class="titlebar-preview neon-preview">
+                <div class="preview-dots">
+                  <span class="pdot red"></span>
+                  <span class="pdot yellow"></span>
+                  <span class="pdot green"></span>
+                </div>
+                <span class="preview-title">Strudel Studio</span>
+              </div>
+              <div class="titlebar-option-content">
+                <span class="titlebar-name">Néon Cyber Indigo</span>
+                <span class="titlebar-desc">Bordure inférieure indigo électrique vibrante avec halo lumineux</span>
+              </div>
+            </button>
+
+            <button type="button" class="titlebar-option-btn" data-titlebar="transparent">
+              <div class="titlebar-preview transparent-preview">
+                <div class="preview-dots">
+                  <span class="pdot red"></span>
+                  <span class="pdot yellow"></span>
+                  <span class="pdot green"></span>
+                </div>
+                <span class="preview-title">Strudel Studio</span>
+              </div>
+              <div class="titlebar-option-content">
+                <span class="titlebar-name">Transparente & Intégrée</span>
+                <span class="titlebar-desc">Style Spotify / Discord : le fond s'étend jusqu'en haut sans aucune coupure</span>
+              </div>
+            </button>
+
+            <button type="button" class="titlebar-option-btn" data-titlebar="minimal">
+              <div class="titlebar-preview minimal-preview">
+                <div class="preview-dots">
+                  <span class="pdot gray"></span>
+                  <span class="pdot gray"></span>
+                  <span class="pdot gray"></span>
+                </div>
+                <span class="preview-title minimal-hidden">Strudel Studio</span>
+              </div>
+              <div class="titlebar-option-content">
+                <span class="titlebar-name">Minimaliste Compacte</span>
+                <span class="titlebar-desc">Hauteur réduite (28px), sans titre, boutons discrets pour maximiser l'écran</span>
+              </div>
+            </button>
           </div>
         </div>
       </div>

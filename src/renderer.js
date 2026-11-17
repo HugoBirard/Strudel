@@ -34,8 +34,10 @@ import { initMetronome } from './ui/metronome.js';
 import { initSnippets } from './ui/snippets.js';
 import { initThemes } from './ui/theme.js';
 import { initUpdater } from './ui/updater.js';
+import { initTitlebar } from './ui/titlebar.js';
 
 let snippetsManager = null;
+let titlebarManager = null;
 
 async function play() {
   const code = getEditorCode().trim();
@@ -233,6 +235,7 @@ function initApp() {
     if (confirm('Créer un nouveau fichier vide ?')) {
       setEditorCode('');
       document.getElementById('current-filename').textContent = 'nouveau.strudel';
+      titlebarManager?.setTitlebarStatus('Strudel Studio — nouveau.strudel');
     }
   };
 
@@ -242,6 +245,7 @@ function initApp() {
       if (res) {
         setEditorCode(res.content);
         document.getElementById('current-filename').textContent = res.filename;
+        titlebarManager?.setTitlebarStatus(`Strudel Studio — ${res.filename}`);
         if (getIsPlaying()) play();
       }
     }
@@ -256,11 +260,15 @@ function initApp() {
       });
       if (res) {
         document.getElementById('current-filename').textContent = res.filename;
+        titlebarManager?.setTitlebarStatus(`Strudel Studio — ${res.filename}`);
       }
     }
   };
 
-  // 12. Pré-initialisation propre du moteur Strudel au démarrage
+  // 12. Barre système personnalisée (Style ToDoList)
+  titlebarManager = initTitlebar();
+
+  // 13. Pré-initialisation propre du moteur Strudel au démarrage
   setTimeout(async () => {
     try {
       await initAudioEngine();
