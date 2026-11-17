@@ -33,8 +33,14 @@ export function initThemes() {
   }
 
   // Bindings DOM
-  document.getElementById('btn-open-theme-modal').onclick = openThemeModal;
-  document.getElementById('btn-close-theme-modal').onclick = closeThemeModal;
+  const btnOpenTheme = document.getElementById('btn-theme') || document.getElementById('btn-open-theme-modal');
+  if (btnOpenTheme) btnOpenTheme.onclick = openThemeModal;
+
+  const btnCloseModal = document.getElementById('btn-close-theme-modal');
+  if (btnCloseModal) btnCloseModal.onclick = closeThemeModal;
+
+  const btnCloseTheme = document.getElementById('btn-close-theme');
+  if (btnCloseTheme) btnCloseTheme.onclick = closeThemeModal;
 
   document.querySelectorAll('.theme-card').forEach(card => {
     card.onclick = () => {

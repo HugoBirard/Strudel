@@ -1,7 +1,3 @@
-if (!process.env.XDG_RUNTIME_DIR || process.env.XDG_RUNTIME_DIR.startsWith('/run/user')) {
-  process.env.XDG_RUNTIME_DIR = '/tmp';
-}
-
 const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
