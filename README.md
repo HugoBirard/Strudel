@@ -6,7 +6,7 @@
 [![Engine](https://img.shields.io/badge/engine-Strudel%20WebAudio-success.svg)](https://strudel.cc)
 [![Editor](https://img.shields.io/badge/editor-CodeMirror%206-indigo.svg)](https://codemirror.net)
 [![License](https://img.shields.io/badge/license-AGPL--3.0-orange.svg)](LICENSE)
-[![Documentation PDF](https://img.shields.io/badge/doc-Manuel%20PDF%20(16%20pages)-red.svg)](docs/Strudel_Studio_Documentation.pdf)
+[![Documentation PDF](https://img.shields.io/badge/doc-Manuel%20PDF%20(17%20pages)-red.svg)](docs/Strudel_Studio_Documentation.pdf)
 
 ---
 
@@ -17,15 +17,17 @@
    - [Installation du Raccourci Bureau](#installation-du-raccourci-bureau)
    - [Génération d'un Binaire Autonome (AppImage)](#génération-dun-binaire-autonome-appimage)
 2. [Explication Complète de l'Interface Graphique](#-explication-complète-de-linterface-graphique)
-   - [1. Barre Supérieure (Transport \& Système)](#1-barre-supérieure-transport--système)
-   - [2. Panneau Gauche (Snippets Personnels)](#2-panneau-gauche-snippets-personnels)
-   - [3. Panneau Central (Éditeur Professionnel CodeMirror 6)](#3-panneau-central-éditeur-professionnel-codemirror-6)
-   - [4. Panneau Droit (Visualisateur \& Bus Matériel)](#4-panneau-droit-visualisateur--bus-matériel)
+   - [1. Barre de Titre Système CSD (Style ToDoList & 5 Thèmes)](#1-barre-de-titre-système-csd-style-todolist--5-thèmes)
+   - [2. Barre de Transport & Système](#2-barre-de-transport--système)
+   - [3. Panneau Gauche (Snippets & Tiroir Mobile)](#3-panneau-gauche-snippets--tiroir-mobile)
+   - [4. Panneau Central (Éditeur CodeMirror 6 & Mode Split-Screen)](#4-panneau-central-éditeur-professionnel-codemirror-6--mode-split-screen)
+   - [5. Panneau Droit (Visualisateur & Bus Matériel)](#5-panneau-droit-visualisateur--bus-matériel)
+   - [6. Système de Mises à Jour Graphique Intégré](#6-système-de-mises-à-jour-graphique-intégré)
 3. [Manuel PDF Complet à Télécharger](#-manuel-pdf-complet-à-télécharger)
 4. [Tutoriel Débutant : Composer Pas-à-Pas](#-tutoriel-débutant--composer-un-morceau-étape-par-étape-avec-liens-découte)
-5. [Toutes les Catégories d'Instruments \& Banques Sonores](#-toutes-les-catégories-dinstruments--banques-sonores)
-6. [La Mini-Notation (Rythmes \& Patterns)](#-la-mini-notation-rythme-et-patterns)
-7. [Effets Audio \& Modulation](#-effets-audio--modulation)
+5. [Toutes les Catégories d'Instruments & Banques Sonores](#-toutes-les-catégories-dinstruments--banques-sonores)
+6. [La Mini-Notation (Rythmes & Patterns)](#-la-mini-notation-rythme-et-patterns)
+7. [Effets Audio & Modulation](#-effets-audio--modulation)
 
 ---
 
@@ -73,66 +75,95 @@ L'exécutable autonome est produit dans le dossier `dist/` sous le nom `Strudel 
 
 ## 🎛️ Explication Complète de l'Interface Graphique
 
-L'interface de Strudel Studio a été conçue pour éliminer toute friction visuelle et maximiser la concentration lors de sessions de live-coding.
+L'interface de Strudel Studio a été conçue pour éliminer toute friction visuelle et maximiser la concentration lors de sessions de live-coding, que vous soyez sur grand écran ou en écran scindé côte-à-côte avec une autre fenêtre.
 
 ```
 +-----------------------------------------------------------------------------------------+
-| [LOGO] STRUDEL STUDIO   [PLAY] [STOP]  [● ● ● ●]  BPM [128] [TAP]   [THEME] [FICHIER] [MAJ]|
+| [LOGO] Strudel Studio  ● Prêt                      [Style Titre]   [—]  [口/❐]  [✕]    |
++-----------------------------------------------------------------------------------------+
+| [▶ PLAY] [■ STOP]  [● ● ● ●]  BPM [ 128 ] [-] [+] [TAP]    [🎨 Thèmes] [📁 Fichiers] [🔄]|
 +-----------------------+-----------------------------------------+-----------------------+
 | MES SNIPPETS & LIGNES | ÉDITEUR CODEMIRROR 6                     | VISUALISEUR AUDIO     |
-| [+] [Sauvegarder Sél] | (Coloration syntaxique, auto-close,     | (Oscilloscope + FFT)  |
-|                       |  line numbers, Ctrl+Entrée pour évaluer)|                       |
-| - Kick 808            |                                         | CONTRÔLES MASTER      |
-| - Bass Acid           |  s("sawtooth")                          | Filtre Master (LPF)   |
-| - Nappe Rhodes        |    .note("<c2 [c2 eb2] g2 bb1>")        | Résonance (Q)         |
-|                       |    .lpf(1200)                           | Reverb (Room)         |
-| [Insérer au curseur]  |                                         | Volume Général (Gain) |
+| [+] [Sauvegarder Sél] | [📋 Snippets] [🎛️ Effets] (Mode Compact) | (Oscilloscope + FFT)  |
+|                       |                                         |                       |
+| - Kick 808            |  setcps(128/60/4)                       | CONTRÔLES MASTER      |
+| - Bass Acid 303       |  stack(                                 | Filtre Master (LPF)   |
+| - Nappe Rhodes        |    s("bd [~ cp]").bank("RolandTR909"),  | Résonance (Q)         |
+| - Ambient Arp         |    s("sawtooth").note("c2 eb2")         | Reverb (Room)         |
+|                       |  )                                      | Volume Général (Gain) |
+| [Insérer au curseur]  |                                         |                       |
 +-----------------------+-----------------------------------------+-----------------------+
-|  ● Prêt (Arrêté)      | mon_morceau.strudel                     | WebAudio Master Bus   |
+| ↖ ↑ ↗  Bordures et coins de redimensionnement 8 directions fluides               ↙ ↓ ↘  |
 +-----------------------------------------------------------------------------------------+
 ```
 
-### 1. Barre Supérieure (Transport & Système)
-* **Bouton PLAY (`Ctrl + Entrée`) :** Évalue le code présent dans l'éditeur et démarre la lecture immédiate du pattern. Gère automatiquement le réveil de l'`AudioContext` en cas de suspension d'autoplay par le système.
-* **Bouton STOP (`Ctrl + .`) :** Arrête instantanément tous les flux sonores et coupe l'ensemble des oscillateurs.
-* **Métronome Visuel 4 Temps (Zero-Drift) :** 4 diodes lumineuses indiquent en direct les 4 pulsations du cycle musical. Directement synchronisé sur l'horloge interne de Strudel (`repl.scheduler.now()`), garantissant une absence totale de décalage dans le temps.
-* **Contrôleur de Tempo & TAP :** Réglage fin du tempo en battements par minute (BPM) avec les boutons `+` / `-`, saisie numérique directe, ou en tapant le tempo avec le bouton **TAP**.
-* **Sélecteur de Thèmes (Bouton "Thèmes") :** Permet de choisir parmi 6 ambiances sombres personnalisées sauvegardées automatiquement en local :
-  1. *Obsidian Dark* : Noir profond avec accents vert émeraude et indigo.
-  2. *Cyberpunk Night* : Cyan néon, rose fuchsia et violet électrique.
-  3. *Tokyo Midnight* : Bleu nuit et reflets néons japonais.
-  4. *Deep Space* : Bleu cosmique et touches stellaires.
-  5. *Matrix Emerald* : Noir terminal et vert phosphoreux.
-  6. *Retro Synthwave* : Dégradé coucher de soleil 80s orange et magenta.
-* **Gestion des Fichiers :** Boutons natifs pour créer un nouveau document vide, ouvrir un fichier `.strudel` / `.js`, ou sauvegarder votre session en local (`Ctrl + S`).
-* **Mises à Jour :** Dialogue de mise à jour sécurisé connecté directement au dépôt GitHub officiel `HugoBirard/Strudel` avec vérification des versions et installation en un clic.
+### 1. Barre de Titre Système CSD (Style ToDoList & 5 Thèmes)
+* **Design CSD Frameless :** Barre de titre personnalisée intégrée au corps de l'application, supprimant les lourdeurs de bordures blanches de l'OS tout en restant fluide et native.
+* **Contrôles de Fenêtre Intégrés :**
+  - **Réduire (`[—]`) :** Réduit l'application dans la barre des tâches système.
+  - **Agrandir / Restaurer (`[口]` / `[❐]`) :** Permet de basculer instantanément entre le plein écran et la taille normale restaurée pour placer facilement une autre fenêtre à côté (navigateur, terminal, doc).
+  - **Fermer (`[✕]`) :** Quitte l'application proprement.
+  - **Double-clic rapide :** Double-cliquer sur la zone neutre de la barre bascule également entre l'état agrandi et restauré.
+* **Redimensionnement 8 Directions :** 8 poignées invisibles actives (`n`, `s`, `e`, `w`, `ne`, `nw`, `se`, `sw`) permettent de redimensionner la fenêtre à la souris depuis n'importe quel bord ou coin sous tous les gestionnaires de fenêtres (GNOME Wayland/X11, KDE, Windows, tiling WMs).
+* **5 Styles Visuels Personnalisables (menu Thèmes) :**
+  1. `match-bg` *(Par défaut)* : Teinte monolithique parfaitement unie avec le thème sombre en cours.
+  2. `glass` : Effet verre dépoli *Glassmorphism* avec transparence, lueur subtile et ombre portée.
+  3. `neon` : Liseré supérieur cyberpunk illuminé avec halo indigo phosphorescent.
+  4. `transparent` : Barre totalement transparente sans délimitation visuelle (style Spotify / Discord).
+  5. `minimal` : Hauteur extra-plate ultra-discrète (28px) sans titre pour libérer un maximum d'espace de code.
 
-### 2. Panneau Gauche (Snippets Personnels)
-* **Zéro pré-réglage imposé :** Vous commencez d'une page vierge et constituez votre propre bibliothèque de snippets.
-* **Insertion chirurgicale au curseur :** Le code d'un snippet s'insère exactement à la position du curseur dans l'éditeur, sans ajouter de saut de ligne forcé. Vous pouvez insérer une méthode (ex: `.lpf(800)`) directement à la suite d'un pattern.
-* **Bouton "Sauvegarder la sélection" :** Sélectionnez n'importe quel bloc de texte à la souris dans l'éditeur et cliquez sur le bouton pour enregistrer la ligne en un instant.
+### 2. Barre de Transport & Système
+* **Bouton PLAY (`Ctrl + Entrée`) :** Évalue le code présent dans l'éditeur et démarre immédiatement la lecture. Réveille automatiquement l'`AudioContext` matériel si l'OS avait suspendu la lecture automatique.
+* **Bouton STOP (`Ctrl + .`) :** Coupe instantanément tous les oscillateurs, patterns et cycles sonores.
+* **Métronome Visuel 4 Temps (Zero-Drift) :** 4 diodes lumineuses indiquent les 4 temps de chaque cycle musical. Directement cadencé sur l'horloge interne de Strudel (`repl.scheduler.now()`), garantissant une précision absolue sans aucun décalage temporel.
+* **Contrôleur de Tempo & TAP :** Réglage fin du tempo (BPM) par boutons `+` / `-`, saisie au clavier, ou en tapant manuellement la cadence sur le bouton **TAP**.
+* **Sélecteur de Thèmes (Bouton "Thèmes") :** Choix parmi 6 ambiances sombres professionnelles sauvegardées localement (*Obsidian Dark*, *Cyberpunk Night*, *Tokyo Midnight*, *Deep Space*, *Matrix Emerald*, *Retro Synthwave*), avec prévisualisation et sélection directe du style de barre de titre.
+* **Gestion des Fichiers :** Création d'un document vierge, ouverture d'un fichier existant (`.strudel` / `.js`) et sauvegarde rapide (`Ctrl + S`).
 
-### 3. Panneau Central (Éditeur Professionnel CodeMirror 6)
-* **Coloration syntaxique intégrale :** Met en valeur les fonctions Strudel (`s`, `note`, `stack`, `cpm`), les notes musicales, les accords, les chiffres, les chaînes et les opérateurs de la mini-notation TidalCycles.
-* **Fonctions de productivité :** Numérotation des lignes, auto-fermeture des parenthèses/crochets/guillemets, gestion fluide de l'indentation avec Tab, et pile d'annulation/rétablissement native (`Ctrl + Z` / `Ctrl + Y`).
-* **Barre d'état dynamique :** Affiche le statut du moteur audio (Lecture, Arrêté, Erreur de syntaxe détaillée).
+### 3. Panneau Gauche (Snippets & Tiroir Mobile)
+* **Préréglages Immédiats & Personnalisation :** Fourni avec des patrons sonores prêts à jouer (Kick 808/909, Bass Acid 303, Nappe Rhodes, Arpège d'ambiance) tout en vous laissant enrichir votre bibliothèque personnelle.
+* **Insertion Chirurgicale au Curseur :** Le code d'un snippet s'insère à la position précise du curseur dans l'éditeur sans retour à la ligne involontaire, idéal pour enchaîner des modificateurs (ex: `.lpf(800)`).
+* **Sauvegarde de Sélection Rapide :** Surlignez n'importe quelle ligne dans l'éditeur et cliquez sur *« Sauvegarder la sélection »* pour l'enregistrer instantanément.
+* **Tiroir Tactile / Compact :** Lorsque l'application est réduite en largeur (ex: écran partagé), ce panneau se replie élégamment et s'ouvre d'un clic via le bouton d'en-tête `[📋 Snippets]` sans écraser votre éditeur.
 
-### 4. Panneau Droit (Visualisateur & Bus Matériel)
+### 4. Panneau Central (Éditeur Professionnel CodeMirror 6 & Mode Split-Screen)
+* **Mode Split-Screen & Écran Partagé (Largeur Mini 480px) :**
+  - Conçu pour fonctionner côte-à-côte avec une autre fenêtre (documentation, navigateur web, synthétiseur externe, terminal).
+  - En largeur compacte ($\le$ 920px), l'éditeur de code bénéficie de **100% de la surface utile verticale** avec défilement fluide (`.cm-scroller`). **Le code reste toujours parfaitement visible et accessible, sans être caché ou comprimé**.
+  - Deux boutons d'accès rapide apparaissent directement au-dessus du code (`[📋 Snippets]` et `[🎛️ Effets & Visu]`) pour déployer les panneaux latéraux sous forme de tiroirs en surimpression.
+* **Coloration Syntaxique Intégrale :** Coloration soignée des fonctions Strudel (`s`, `note`, `stack`, `cpm`), des notes, accords, métriques temporelles et symboles de la mini-notation.
+* **Productivité & Ergonomie :** Numérotation des lignes, fermeture automatique des parenthèses/crochets/guillemets, gestion fluide de la tabulation, historique d'annulation/rétablissement (`Ctrl + Z` / `Ctrl + Y`).
+* **Starter Prêt à l'Emploi :** Au premier lancement, l'application démarre avec un motif rythmique TR-909 et une ligne de basse acide préchargés pour entendre immédiatement le son dès le clic sur **PLAY**.
+
+### 5. Panneau Droit (Visualisateur & Bus Matériel)
 * **Visualisateur Audio Temps Réel 60 FPS :**
-  - *Oscilloscope temporel :* Tracé en surbrillance reproduisant la forme d'onde physique générée.
-  - *Spectre de fréquences FFT :* 28 bandes de fréquences réagissant dynamiquement au signal audio.
-* **Curseur Master Cutoff (Filtre Passe-Bas) :** Connecté physiquement à un `BiquadFilterNode` filtrant l'ensemble du flux sonore en direct (200 Hz à 20000 Hz).
-* **Curseur Résonance (Q) :** Ajuste le pic de résonance du filtre master.
-* **Curseur Reverb (macroRoom) :** Variable globale d'espace acoustique et de réverbération.
-* **Curseur Volume Général :** Contrôle un vrai `GainNode` matériel sur le bus master avant les enceintes.
+  - *Oscilloscope temporel :* Onde illuminée réactive traduisant fidèlement la vibration sonore (sinus, carré, bruit, impulsions).
+  - *Spectre de fréquences FFT :* 28 bandes de fréquences réagissant dynamiquement au signal de sortie master.
+* **Filtre Passe-Bas Master (Cutoff) :** Connecté physiquement à un vrai composant WebAudio `BiquadFilterNode` (200 Hz à 20 000 Hz).
+* **Résonance Master (Q) :** Ajuste l'intensité de la pointe de résonance du filtre.
+* **Reverb Master (macroRoom) :** Dosage spatial global de la réverbération.
+* **Volume Général Master :** Ajustement direct du gain matériel avant la sortie vers vos haut-parleurs ou votre casque.
+
+### 6. Système de Mises à Jour Graphique Intégré
+Strudel Studio intègre un centre de mise à jour moderne, propre et silencieux, **sans aucune popup d'alerte intrusive (`alert()`)** :
+* **Recherche Intelligente (`checking`) :** Animation discrète et vérification des derniers commits sur la branche principale du dépôt `HugoBirard/Strudel`.
+* **État À Jour (`up-to-date`) :** Badge de confirmation visuelle avec numéro de révision et SHA du dernier commit actif.
+* **Mise à Jour Détectée (`update-available`) :**
+  - Affichage clair du nombre de commits d'écart.
+  - **Changelog complet :** Liste détaillée des derniers commits et modifications apportées au projet.
+  - Bouton interactif *« Mettre à jour maintenant »*.
+* **Installation Automatique en Un Clic (`installing`) :**
+  - Téléchargement des modifications via `git pull` et installation des dépendances éventuelles via `npm install`.
+  - Jauge de progression animée et redémarrage automatique en fin d'installation.
+* **Résilience Réseau (`error` / `offline`) :** Diagnostic explicatif sans jamais bloquer ou interrompre votre session musicale en cours.
 
 ---
 
 ## 📄 Manuel PDF Complet à Télécharger
 
-Pour consulter le manuel complet hors-ligne, imprimer le guide ou approfondir toutes les possibilités de live-coding, un document PDF de 16 pages rédigé et compilé avec soin est disponible dans le projet :
+Pour consulter le manuel complet hors-ligne, imprimer le guide ou approfondir toutes les possibilités de live-coding, un document PDF de 17 pages rédigé et compilé avec soin est disponible dans le projet :
 
-👉 **[Consulter / Télécharger le Manuel Complet (PDF 16 pages)](docs/Strudel_Studio_Documentation.pdf)**
+👉 **[Consulter / Télécharger le Manuel Complet (PDF 17 pages)](docs/Strudel_Studio_Documentation.pdf)**
 
 Ce fichier contient l'intégralité du catalogue des 128 instruments General MIDI, les boîtes à rythmes, les synthétiseurs Superdough, le dictionnaire complet de la mini-notation rythmique et les fonctions algorithmiques.
 

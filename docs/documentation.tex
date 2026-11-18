@@ -107,38 +107,61 @@ Le fichier généré sera disponible dans le répertoire \texttt{dist/} sous le 
 \newpage
 
 \section{Visite Guidée de l'Interface Utilisateur}
-L'interface de Strudel Studio est organisée en 4 zones distinctes conçues pour le confort visuel et l'efficacité lors de sessions prolongées.
+L'interface de Strudel Studio a été conçue pour éliminer toute friction visuelle, allier esthétique sombre et ergonomie de production, et s'adapter avec fluidité à tous les agencements d'écrans (du plein écran 4K jusqu'au mode scindé côte-à-côte).
 
-\subsection{1. Barre Supérieure (Barre de Transport \& Système)}
-La barre supérieure arbore un style glassmorphism élégant calé sur le fond sombre :
+\subsection{1. Barre de Titre Système CSD \& Contrôles de Fenêtre (Style ToDoList)}
+Strudel Studio intègre une barre de titre personnalisée \textit{Client-Side Decorations} (CSD) sans bordure native encombrante :
+\begin{itemize}
+    \item \textbf{Contrôles de Fenêtre Intégrés :}
+    \begin{itemize}
+        \item \textbf{Réduire (\texttt{[-]}) :} Minimise l'application dans la barre des tâches de votre environnement de bureau.
+        \item \textbf{Agrandir / Restaurer (\texttt{[+]} / \texttt{[Restaurer]}) :} Alterne instantanément entre l'affichage plein écran et la dimension normale restaurée. Cette fonction est essentielle pour disposer confortablement Strudel Studio à côté d'une autre fenêtre (navigateur web, éditeur tiers, terminal).
+        \item \textbf{Fermer (\texttt{[x]}) :} Ferme proprement l'application et libère l'AudioContext.
+        \item \textbf{Double-clic rapide :} Un double-clic sur la barre de titre bascule également l'état maximisé / restauré.
+    \end{itemize}
+    \item \textbf{Redimensionnement Fluide 8 Directions :} La fenêtre intègre 8 zones de détection actives aux 4 bordures et 4 coins (\texttt{n}, \texttt{s}, \texttt{e}, \texttt{w}, \texttt{ne}, \texttt{nw}, \texttt{se}, \texttt{sw}) permettant d'ajuster librement la taille de la fenêtre à la souris sous n'importe quel gestionnaire de fenêtres (GNOME Wayland/X11, KDE Plasma, Windows 10/11, gestionnaires de fenêtres en tuiles).
+    \item \textbf{5 Styles Visuels Personnalisables :} Accessibles depuis le sélecteur de thèmes :
+    \begin{enumerate}
+        \item \texttt{match-bg} \textit{(Par défaut)} : Aspect monolithique uni, parfaitement fusionné avec la nuance sombre du thème sélectionné.
+        \item \texttt{glass} : Effet de verre translucide \textit{Glassmorphism} avec flou d'arrière-plan, reflet supérieur et ombre portée.
+        \item \texttt{neon} : Liseré supérieur cyberpunk illuminé avec halo indigo phosphorescent.
+        \item \texttt{transparent} : Transparence intégrale sans séparation visuelle (style Spotify / Discord).
+        \item \texttt{minimal} : Hauteur ultra-réduite (28 px) masquant le titre pour dédier 100\% de l'espace au code.
+    \end{enumerate}
+\end{itemize}
+
+\subsection{2. Barre de Transport \& Synchronisation Métrique Zero-Drift}
 \begin{itemize}
     \item \textbf{Bouton PLAY (\texttt{Ctrl + Entrée}) :} Lance l'évaluation du code en cours dans l'éditeur. Réveille instantanément l'AudioContext en cas de restriction d'autoplay du système d'exploitation.
     \item \textbf{Bouton STOP (\texttt{Ctrl + .}) :} Coupe immédiatement tous les cycles sonores et libère les oscillateurs actifs.
     \item \textbf{Métronome Visuel 4 Temps (Zero-Drift) :} 4 diodes lumineuses indiquent en temps réel les pulsations du cycle rythmique. Contrairement aux métronomes classiques utilisant des timers JavaScript décalés, ce métronome est directement asservi à l'horloge haute précision de Strudel (\texttt{repl.scheduler.now()}).
     \item \textbf{Contrôleur de Tempo (BPM) \& TAP :} Permet d'ajuster le tempo à la volée avec les boutons $+$ / $-$, par saisie numérique ou en battant la mesure sur le bouton \textbf{TAP}.
-    \item \textbf{Bouton Thème :} Ouvre un panneau permettant de basculer instantanément entre 6 thèmes d'interface personnalisés.
+    \item \textbf{Bouton Thème :} Ouvre un panneau permettant de basculer instantanément entre 6 thèmes d'interface personnalisés et de sélectionner le style de barre de titre CSD.
     \item \textbf{Boutons Fichier (Nouveau, Ouvrir, Sauvegarder) :} Permettent de gérer vos fichiers de patterns musicaux locaux (\texttt{.strudel}, \texttt{.js}).
-    \item \textbf{Bouton Mises à Jour :} Vérifie la disponibilité de nouveaux commits sur le dépôt GitHub officiel \texttt{HugoBirard/Strudel} et permet l'installation en un clic.
 \end{itemize}
 
-\subsection{2. Panneau Gauche (Bibliothèque Personnelle de Snippets)}
-Ce panneau vous permet d'enregistrer vos motifs musicaux, progressions d'accords et effets favoris pour les réutiliser d'un simple clic :
+\subsection{3. Panneau Gauche : Bibliothèque de Snippets \& Tiroir Rétractable}
+Ce panneau permet de conserver vos briques de composition favorites :
 \begin{itemize}
+    \item \textbf{Préréglages Immédiats :} Prise en main instantanée avec des patterns prêts à l'emploi (Kick 808/909, Bass Acid 303, Nappe Rhodes, Arpège d'ambiance).
     \item \textbf{Insertion chirurgicale au curseur :} Cliquer sur \textit{"Insérer au curseur"} injecte exactement le code à l'emplacement actif du curseur dans l'éditeur, sans ajouter de saut de ligne parasite.
     \item \textbf{Bouton "Sauvegarder la sélection" :} Sélectionnez une portion de texte dans l'éditeur à la souris et cliquez sur ce bouton pour créer un nouveau snippet pré-rempli.
-    \item \textbf{Persistance locale :} Vos snippets sont conservés dans le stockage local de votre machine d'une session à l'autre.
+    \item \textbf{Mode Tiroir en Écran Partagé :} En largeur compacte, le panneau se replie et s'ouvre sous forme de tiroir fluide en surimpression d'un clic sur le bouton d'en-tête \texttt{[Snippets]} sans réduire la surface du code.
 \end{itemize}
 
-\subsection{3. Panneau Central (Éditeur Professionnel CodeMirror 6)}
+\subsection{4. Panneau Central : Éditeur Professionnel CodeMirror 6 \& Architecture Split-Screen}
 Le cœur de travail de l'application bénéficie de toute la puissance de CodeMirror 6 :
 \begin{itemize}
+    \item \textbf{Conception Responsive Split-Screen (Largeur Mini 480 px) :}
+    L'application accepte un redimensionnement jusqu'à $480 \times 360$ pixels pour permettre une juxtaposition fluide côte-à-côte avec un autre outil de développement, un navigateur web ou la documentation.
+    En mode compact ($\le 920$ px), \textbf{le code reste 100\% visible et manipulable} grâce au défilement vertical et horizontal CodeMirror (\texttt{.cm-scroller}) qui bénéficie de toute la hauteur de fenêtre disponible.
+    \item \textbf{Démarrage Sonore Immédiat :} Prévention active des restrictions d'autoplay du navigateur et mise en cache des échantillons de percussion (\texttt{RolandTR909}). L'application démarre avec un motif rythmique et une ligne de basse prête à jouer.
     \item \textbf{Coloration syntaxique complète :} Reconnaissance native des fonctions Strudel (\texttt{s}, \texttt{note}, \texttt{stack}, \texttt{cpm}), de la mini-notation TidalCycles (crochets, chevrons, alternances, accélérations), des variables et des nombres.
-    \item \textbf{Auto-fermeture :} Fermeture automatique des parenthèses, crochets, accolades et guillemets.
-    \item \textbf{Indentation automatique :} Gestion intelligente de la touche Tabulation.
+    \item \textbf{Auto-fermeture \& Indentation :} Fermeture automatique des délimiteurs et gestion intelligente de la touche Tabulation.
     \item \textbf{Barre de statut dynamique :} Affiche en temps réel si le moteur audio est à l'arrêt, en cours d'évaluation, ou si une erreur de syntaxe a été détectée dans le code.
 \end{itemize}
 
-\subsection{4. Panneau Droit (Visualisateur Audio \& Bus Matériel)}
+\subsection{5. Panneau Droit : Visualisateur Audio 60 FPS \& Bus Matériel WebAudio}
 \begin{itemize}
     \item \textbf{Visualisateur Audio Réactif 60 FPS :}
     \begin{itemize}
@@ -149,6 +172,17 @@ Le cœur de travail de l'application bénéficie de toute la puissance de CodeMi
     \item \textbf{Curseur Résonance (Q) :} Ajuste le facteur de qualité (résonance) du filtre passe-bas master.
     \item \textbf{Curseur Reverb (macroRoom) :} Variable globale de diffusion spatiale utilisable dans vos morceaux.
     \item \textbf{Curseur Volume Général :} Contrôle le gain matériel final (\texttt{GainNode}) sans distorsion numérique.
+    \item \textbf{Accès en Tiroir Compact :} En mode fenêtré étroit, le visualisateur et les contrôles master s'ouvrent en superposition d'un simple clic sur \texttt{[Effets \& Visu]}.
+\end{itemize}
+
+\subsection{6. Centre de Mises à Jour Graphique Intégré}
+Strudel Studio élimine totalement les dialogues \texttt{alert()} natifs du navigateur au profit d'une interface modale sobre, réactive et ergonomique :
+\begin{itemize}
+    \item \textbf{Vérification en Arrière-Plan (\texttt{checking}) :} Détecte automatiquement la révision distante sur le dépôt GitHub \texttt{HugoBirard/Strudel}.
+    \item \textbf{État Confirmé À Jour (\texttt{up-to-date}) :} Affiche le badge de conformité avec l'identifiant court (SHA) du commit en cours d'exécution.
+    \item \textbf{Mise à Jour Détectée (\texttt{update-available}) :} Affiche le nombre de commits d'avance sur le dépôt distant ainsi que le \textbf{journal complet des modifications (changelog)} avant d'appliquer la mise à niveau via le bouton \textit{"Mettre à jour maintenant"}.
+    \item \textbf{Progression en Direct (\texttt{installing}) :} Affiche une jauge d'avancement animée pendant l'exécution des opérations \texttt{git pull} et \texttt{npm install}, suivie du redémarrage automatique de l'application.
+    \item \textbf{Résilience \& Diagnostic (\texttt{error}) :} En cas de déconnexion réseau, un statut explicatif est proposé sans interrompre votre session musicale.
 \end{itemize}
 
 \newpage
