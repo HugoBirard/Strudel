@@ -6,6 +6,8 @@ contextBridge.exposeInMainWorld('desktopApi', {
   windowMaximize: () => ipcRenderer.send('window:maximize'),
   windowClose: () => ipcRenderer.send('window:close'),
   isWindowMaximized: () => ipcRenderer.invoke('window:isMaximized'),
+  windowSetBounds: (bounds) => ipcRenderer.send('window:setBounds', bounds),
+  windowGetBounds: () => ipcRenderer.invoke('window:getBounds'),
   onMaximizeChange: (callback) => {
     ipcRenderer.on('window:maximize-change', (_event, isMaximized) => callback(isMaximized));
   },

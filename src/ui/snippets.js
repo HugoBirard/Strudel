@@ -5,16 +5,42 @@
 
 const SNIPPETS_STORAGE_KEY = 'strudel_user_snippets';
 
+const DEFAULT_STARTER_SNIPPETS = [
+  {
+    id: 'starter-1',
+    title: 'Beat Techno Minimal',
+    code: 's("bd [~ cp] [bd bd] cp")'
+  },
+  {
+    id: 'starter-2',
+    title: 'Basse Acid 303 (Synthé)',
+    code: 'note("c2 [c2 eb2] f2 [g2 bb2]").s("sawtooth").lpf(1800).lpq(6)'
+  },
+  {
+    id: 'starter-3',
+    title: 'Hi-Hats Trap 16th',
+    code: 's("hh*16").gain(0.4)'
+  },
+  {
+    id: 'starter-4',
+    title: 'Arpège Ambient (Triangle)',
+    code: 'note("c4 eb4 g4 bb4 c5 eb5").s("triangle").fast(2).gain(0.5)'
+  }
+];
+
 export function initSnippets({ container, onInsert }) {
   if (!container) return;
 
   function getUserSnippets() {
     try {
       const raw = localStorage.getItem(SNIPPETS_STORAGE_KEY);
-      return raw ? JSON.parse(raw) : [];
+      if (raw === null) {
+        return DEFAULT_STARTER_SNIPPETS;
+      }
+      return JSON.parse(raw);
     } catch (e) {
       console.warn('Erreur lecture snippets:', e);
-      return [];
+      return DEFAULT_STARTER_SNIPPETS;
     }
   }
 

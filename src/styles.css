@@ -148,6 +148,25 @@ body {
 }
 
 /* ==========================================================================
+   BORDURES DE REDIMENSIONNEMENT (FENÊTRE FRAMELESS LINUX & DESKTOP)
+   ========================================================================== */
+
+.win-resizer {
+  position: fixed;
+  z-index: 9999;
+  user-select: none;
+  background: transparent;
+}
+.resizer-top { top: 0; left: 8px; right: 8px; height: 6px; cursor: n-resize; }
+.resizer-bottom { bottom: 0; left: 8px; right: 8px; height: 6px; cursor: s-resize; }
+.resizer-left { left: 0; top: 8px; bottom: 8px; width: 6px; cursor: w-resize; }
+.resizer-right { right: 0; top: 8px; bottom: 8px; width: 6px; cursor: e-resize; }
+.resizer-top-left { top: 0; left: 0; width: 12px; height: 12px; cursor: nw-resize; }
+.resizer-top-right { top: 0; right: 0; width: 12px; height: 12px; cursor: ne-resize; }
+.resizer-bottom-left { bottom: 0; left: 0; width: 12px; height: 12px; cursor: sw-resize; }
+.resizer-bottom-right { bottom: 0; right: 0; width: 12px; height: 12px; cursor: se-resize; }
+
+/* ==========================================================================
    BARRE SYSTÈME NATIVE STYLE TODOLIST (GTK4 / MATCH-BG / GLASSMORPHISM)
    ========================================================================== */
 
@@ -660,15 +679,59 @@ body {
 }
 
 /* ==========================================================================
-   MAIN 3-PANEL WORKSPACE
+   MAIN 3-PANEL WORKSPACE (RESPONSIVE FLUIDE POUR REDIMENSIONNEMENT & CÔTE-À-CÔTE)
    ========================================================================== */
 
 .main-workspace {
   flex: 1;
   display: grid;
-  grid-template-columns: 320px 1fr 290px;
+  grid-template-columns: minmax(180px, 280px) 1fr minmax(180px, 260px);
   overflow: hidden;
   background-color: var(--bg-dark);
+  min-width: 0;
+  min-height: 0;
+}
+
+@media (max-width: 1080px) {
+  .main-workspace {
+    grid-template-columns: minmax(160px, 220px) 1fr minmax(160px, 220px);
+  }
+}
+
+@media (max-width: 860px) {
+  .main-workspace {
+    grid-template-columns: 1fr;
+  }
+  .sidebar-left,
+  .sidebar-right {
+    display: none;
+  }
+}
+
+@media (max-width: 950px) {
+  .metro-box {
+    display: none;
+  }
+  .brand-badge {
+    display: none;
+  }
+  .top-actions .btn-action span,
+  .top-actions .btn-update span {
+    display: none;
+  }
+}
+
+@media (max-width: 650px) {
+  .transport-bar {
+    padding: 0 8px;
+    gap: 6px;
+  }
+  .brand-title {
+    display: none;
+  }
+  .tempo-box button#btn-tap {
+    display: none;
+  }
 }
 
 /* ==========================================================================

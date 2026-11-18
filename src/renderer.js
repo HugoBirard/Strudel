@@ -39,6 +39,29 @@ import { initTitlebar } from './ui/titlebar.js';
 let snippetsManager = null;
 let titlebarManager = null;
 
+const DEFAULT_STARTER_CODE = `// Bienvenue dans Strudel Studio Desktop !
+// Appuyez sur Ctrl + Entrée (ou le bouton PLAY) pour lancer la musique.
+
+setcps(130/60/4)
+
+// 1. Rythmique (Kick & Clap)
+s("bd [~ cp] [bd bd] cp")
+
+// 2. Basse Acid avec synthétiseur natif 100% autonome
+stack(
+  note("c2 [c2 eb2] f2 [g2 bb2]")
+    .s("sawtooth")
+    .lpf(2200)
+    .lpq(4),
+
+  // 3. Arpège mélodique
+  note("c4 eb4 g4 bb4 c5 eb5")
+    .s("triangle")
+    .fast(2)
+    .gain(0.5)
+)
+`;
+
 async function play() {
   const code = getEditorCode().trim();
   if (!code) {
@@ -86,7 +109,7 @@ function initApp() {
   const editorContainer = document.getElementById('code-editor-container');
   initCodeEditor({
     container: editorContainer,
-    initialCode: '',
+    initialCode: DEFAULT_STARTER_CODE,
     onEvaluate: () => play(),
     onStop: () => stop(),
     onChange: () => {
@@ -232,8 +255,8 @@ function initApp() {
 
   // 11. Gestion des fichiers (IPC Electron)
   document.getElementById('btn-new').onclick = () => {
-    if (confirm('Créer un nouveau fichier vide ?')) {
-      setEditorCode('');
+    if (confirm('Créer un nouveau fichier ?')) {
+      setEditorCode(DEFAULT_STARTER_CODE);
       document.getElementById('current-filename').textContent = 'nouveau.strudel';
       titlebarManager?.setTitlebarStatus('Strudel Studio — nouveau.strudel');
     }

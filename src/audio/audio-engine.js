@@ -26,23 +26,59 @@ window.macroRoom = 0.5;
 window.masterGainValue = 0.85;
 
 /**
+ * Intercepteur WebAudio sécurisé : garantit que tous les flux audio (synthés et samples)
+ * atteignent les haut-parleurs SANS FAILLE et alimentent simultanément l'analyseur FFT.
+ */
+function setupAudioTap(analyser, filter) {
+  if (window._audioInterceptorInstalled) return;
+  window._audioInterceptorInstalled = true;
+
+  const originalConnect = AudioNode.prototype.connect;
+  AudioNode.prototype.connect = function(dest, ...args) {
+    if (this && dest && this.context && analyser && this.context === analyser.context) {
+      try {
+        const isDestination = (dest instanceof AudioDestinationNode) ||
+          (dest && dest.constructor && dest.constructor.name === 'AudioDestinationNode');
+
+        if (isDestination && this !== analyser && this !== filter) {
+          try {
+            originalConnect.call(this, analyser);
+          } catch (_) {}
+        }
+      } catch (_) {}
+    }
+    return originalConnect.call(this, dest, ...args);
+  };
+}
+
+/**
  * Initialise le graphe WebAudio et le moteur Strudel
  */
 export async function initAudioEngine() {
-  if (repl) return repl;
+  if (repl) {
+    if (audioContext && audioContext.state === 'suspended') {
+      try { await audioContext.resume(); } catch (_) {}
+    }
+    return repl;
+  }
 
-  // 1. Contexte WebAudio
+  // 1. Contexte WebAudio natif
   audioContext = typeof getAudioContext === 'function' ? getAudioContext() : new (window.AudioContext || window.webkitAudioContext)();
+
+  // Déblocage immédiat de l'audioContext
+  if (audioContext.state === 'suspended') {
+    try { await audioContext.resume(); } catch (_) {}
+  }
 
   // 2. Filtre Master Passe-Bas (LPF)
   masterFilterNode = audioContext.createBiquadFilter();
   masterFilterNode.type = 'lowpass';
-  masterFilterNode.frequency.setValueAtTime(20000, audioContext.currentTime);
-  masterFilterNode.Q.setValueAtTime(1, audioContext.currentTime);
+  masterFilterNode.frequency.setValueAtTime(window.macroLPF || 20000, audioContext.currentTime);
+  masterFilterNode.Q.setValueAtTime(window.macroLPQ || 1, audioContext.currentTime);
 
   // 3. Gain Master (Volume général)
   masterGainNode = audioContext.createGain();
-  masterGainNode.gain.setValueAtTime(window.masterGainValue, audioContext.currentTime);
+  masterGainNode.gain.setValueAtTime(window.masterGainValue !== undefined ? window.masterGainValue : 0.85, audioContext.currentTime);
 
   // 4. Analyseur FFT (Visualisateur)
   analyserNode = audioContext.createAnalyser();
@@ -54,32 +90,33 @@ export async function initAudioEngine() {
   masterGainNode.connect(analyserNode);
   analyserNode.connect(audioContext.destination);
 
-  // 5. Initialisation du REPL Strudel avec aiguillage vers le Master Filter
+  // Installe le tap pour alimenter le visualiseur sur toutes les voix de synthèse
+  setupAudioTap(analyserNode, masterFilterNode);
+
+  // 5. Initialisation du REPL Strudel avec pré-chargement des samples
   repl = await initStrudel({
-    outputNode: masterFilterNode
+    prebake: async () => {
+      try {
+        if (typeof samples === 'function') {
+          await samples('github:tidalcycles/dirt-samples');
+        }
+      } catch (err) {
+        console.warn('[AudioEngine] Samples distants inaccessibles en mode hors-ligne:', err?.message || err);
+      }
+    }
   });
 
-  // Raccordement du contrôleur Superdough vers le Master Filter
+  // Raccordement sécurisé du contrôleur Superdough vers le Master Filter
   try {
     const controller = typeof getSuperdoughAudioController === 'function' ? getSuperdoughAudioController() : null;
     if (controller && controller.output && controller.output.destinationGain) {
       try {
-        controller.output.destinationGain.disconnect();
+        controller.output.destinationGain.connect(masterFilterNode);
       } catch (_) {}
-      controller.output.destinationGain.connect(masterFilterNode);
     }
   } catch (err) {
     console.warn('[AudioEngine] Raccordement Superdough:', err);
   }
-
-  // Chargement non-bloquant des samples distants (samples GitHub Tidal)
-  try {
-    if (typeof samples === 'function') {
-      samples('github:tidalcycles/dirt-samples').catch(err => {
-        console.warn('[AudioEngine] Samples distants inaccessibles en mode hors-ligne:', err.message);
-      });
-    }
-  } catch (_) {}
 
   return repl;
 }
@@ -95,8 +132,9 @@ export async function playPattern(code) {
   const engine = await initAudioEngine();
 
   // Débloque l'AudioContext si suspendu (politique autoplay)
-  if (audioContext && audioContext.state === 'suspended') {
-    await audioContext.resume();
+  const ctx = audioContext || (typeof getAudioContext === 'function' ? getAudioContext() : null);
+  if (ctx && ctx.state === 'suspended') {
+    await ctx.resume();
   }
 
   await engine.evaluate(code);
@@ -123,13 +161,17 @@ export function stopAudio() {
 }
 
 /**
- * Règle le volume général en temps réel (0.0 à 1.0)
+ * Règle le volume général en temps réel (0.0 à 1.5)
  */
 export function setMasterVolume(value) {
   const vol = Math.max(0, Math.min(1.5, parseFloat(value) || 0));
   window.masterGainValue = vol;
   if (masterGainNode && audioContext) {
-    masterGainNode.gain.setTargetAtTime(vol, audioContext.currentTime, 0.015);
+    try {
+      masterGainNode.gain.setTargetAtTime(vol, audioContext.currentTime, 0.015);
+    } catch (_) {
+      masterGainNode.gain.value = vol;
+    }
   }
 }
 
@@ -140,7 +182,11 @@ export function setMasterLPF(freq) {
   const f = Math.max(20, Math.min(20000, parseFloat(freq) || 20000));
   window.macroLPF = f;
   if (masterFilterNode && audioContext) {
-    masterFilterNode.frequency.setTargetAtTime(f, audioContext.currentTime, 0.015);
+    try {
+      masterFilterNode.frequency.setTargetAtTime(f, audioContext.currentTime, 0.015);
+    } catch (_) {
+      masterFilterNode.frequency.value = f;
+    }
   }
 }
 
@@ -151,7 +197,11 @@ export function setMasterLPQ(q) {
   const resonance = Math.max(0.1, Math.min(25, parseFloat(q) || 1));
   window.macroLPQ = resonance;
   if (masterFilterNode && audioContext) {
-    masterFilterNode.Q.setTargetAtTime(resonance, audioContext.currentTime, 0.015);
+    try {
+      masterFilterNode.Q.setTargetAtTime(resonance, audioContext.currentTime, 0.015);
+    } catch (_) {
+      masterFilterNode.Q.value = resonance;
+    }
   }
 }
 

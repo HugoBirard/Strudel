@@ -5,6 +5,9 @@ const { execFile } = require('child_process');
 const util = require('util');
 const execFilePromise = util.promisify(execFile);
 
+// Autorise l'autoplay WebAudio sans blocage dans Electron
+app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
+
 let mainWindow;
 
 function createWindow() {
@@ -12,10 +15,10 @@ function createWindow() {
   const iconPath = path.join(__dirname, '..', 'assets', 'icon.svg');
 
   mainWindow = new BrowserWindow({
-    width: 1400,
-    height: 900,
-    minWidth: 1024,
-    minHeight: 700,
+    width: 1300,
+    height: 850,
+    minWidth: 480,
+    minHeight: 360,
     frame: false,
     show: !isHeadless,
     title: 'Strudel Studio',
@@ -91,6 +94,16 @@ ipcMain.on('window:close', () => {
 
 ipcMain.handle('window:isMaximized', () => {
   return mainWindow ? mainWindow.isMaximized() : false;
+});
+
+ipcMain.on('window:setBounds', (_e, bounds) => {
+  if (mainWindow && !mainWindow.isMaximized()) {
+    mainWindow.setBounds(bounds);
+  }
+});
+
+ipcMain.handle('window:getBounds', () => {
+  return mainWindow ? mainWindow.getBounds() : { x: 0, y: 0, width: 1200, height: 800 };
 });
 
 // 1. DIALOGUES DE FICHIERS NATIFS SÉCURISÉS
