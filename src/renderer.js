@@ -157,6 +157,36 @@ function initApp() {
   // 6. Initialisation de l'Updater Desktop
   initUpdater();
 
+  // 6b. Gestion des tiroirs latéraux en mode compact (écran partagé / côte-à-côte)
+  const btnToggleLeft = document.getElementById('btn-toggle-left-sidebar');
+  const btnToggleRight = document.getElementById('btn-toggle-right-sidebar');
+  const sidebarLeft = document.querySelector('.sidebar-left');
+  const sidebarRight = document.querySelector('.sidebar-right');
+
+  if (btnToggleLeft && sidebarLeft) {
+    btnToggleLeft.onclick = (e) => {
+      e.stopPropagation();
+      sidebarLeft.classList.toggle('drawer-open');
+      sidebarRight?.classList.remove('drawer-open');
+    };
+  }
+
+  if (btnToggleRight && sidebarRight) {
+    btnToggleRight.onclick = (e) => {
+      e.stopPropagation();
+      sidebarRight.classList.toggle('drawer-open');
+      sidebarLeft?.classList.remove('drawer-open');
+    };
+  }
+
+  // Fermeture des tiroirs si clic en dehors
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.sidebar-left') && !e.target.closest('.sidebar-right') && !e.target.closest('.editor-compact-toggles')) {
+      sidebarLeft?.classList.remove('drawer-open');
+      sidebarRight?.classList.remove('drawer-open');
+    }
+  });
+
   // 7. Boutons Transport Audio
   document.getElementById('btn-play').onclick = () => play();
   document.getElementById('btn-stop').onclick = () => stop();

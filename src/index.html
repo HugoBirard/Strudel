@@ -202,6 +202,19 @@
           </svg>
           <span id="current-filename">mon_morceau.strudel</span>
         </div>
+
+        <!-- Boutons d'accès rapide aux tiroirs latéraux en mode compact / écran partagé -->
+        <div class="editor-compact-toggles">
+          <button id="btn-toggle-left-sidebar" class="btn-compact-drawer" title="Afficher les Snippets">
+            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>Snippets</span>
+          </button>
+          <button id="btn-toggle-right-sidebar" class="btn-compact-drawer" title="Afficher Effets & Visualiseur">
+            <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Effets</span>
+          </button>
+        </div>
+
         <div style="font-size: 11px; color: var(--text-muted);">
           <kbd style="background: rgba(0,0,0,0.3); padding: 2px 5px; border-radius: 4px; border: 1px solid var(--border);">Ctrl + Entrée</kbd> pour Évaluer
         </div>
@@ -481,35 +494,25 @@
     </div>
   </div>
 
-  <!-- 5. MODAL DE MISE À JOUR -->
+  <!-- 5. MODAL DE MISE À JOUR (STYLE PREMIUM FLUIDE SANS ALERTES) -->
   <div id="update-modal" class="modal-overlay">
-    <div class="modal-card">
+    <div class="update-modal-card">
       <div class="modal-header">
         <div class="modal-title">
           <svg class="svg-icon" viewBox="0 0 24 24" style="color: var(--primary);">
             <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
           </svg>
-          <span id="modal-update-title">Mise à jour disponible</span>
+          <span id="modal-update-header-title">Mises à jour du logiciel</span>
         </div>
-        <button id="btn-close-modal" class="tempo-btn" style="width: 24px; height: 24px;">✕</button>
+        <button id="btn-close-modal" class="tempo-btn" style="width: 24px; height: 24px;" title="Fermer">✕</button>
       </div>
 
       <div class="modal-body" id="modal-update-body">
-        <p id="modal-update-msg">Une nouvelle version de Strudel Studio est disponible sur le dépôt.</p>
-        <div style="margin: 10px 0 4px 0; font-size: 11px; font-weight: 600;">Détails des modifications :</div>
-        <div class="changelog-box" id="modal-changelog">Vérification...</div>
+        <!-- Rempli dynamiquement par updater.js -->
       </div>
 
-      <div class="modal-footer">
-        <button id="btn-cancel-update" class="btn-action">Fermer</button>
-        <button id="btn-confirm-install" class="btn-play" style="padding: 7px 16px;">
-          <svg class="svg-icon" viewBox="0 0 24 24">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-            <polyline points="7 10 12 15 17 10" />
-            <line x1="12" y1="15" x2="12" y2="3" />
-          </svg>
-          <span id="btn-install-label">Installer et Redémarrer</span>
-        </button>
+      <div class="modal-footer" id="modal-update-footer">
+        <!-- Rempli dynamiquement par updater.js -->
       </div>
     </div>
   </div>

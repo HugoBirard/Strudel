@@ -685,53 +685,12 @@ body {
 .main-workspace {
   flex: 1;
   display: grid;
-  grid-template-columns: minmax(180px, 280px) 1fr minmax(180px, 260px);
+  grid-template-columns: 280px 1fr 270px;
   overflow: hidden;
   background-color: var(--bg-dark);
   min-width: 0;
   min-height: 0;
-}
-
-@media (max-width: 1080px) {
-  .main-workspace {
-    grid-template-columns: minmax(160px, 220px) 1fr minmax(160px, 220px);
-  }
-}
-
-@media (max-width: 860px) {
-  .main-workspace {
-    grid-template-columns: 1fr;
-  }
-  .sidebar-left,
-  .sidebar-right {
-    display: none;
-  }
-}
-
-@media (max-width: 950px) {
-  .metro-box {
-    display: none;
-  }
-  .brand-badge {
-    display: none;
-  }
-  .top-actions .btn-action span,
-  .top-actions .btn-update span {
-    display: none;
-  }
-}
-
-@media (max-width: 650px) {
-  .transport-bar {
-    padding: 0 8px;
-    gap: 6px;
-  }
-  .brand-title {
-    display: none;
-  }
-  .tempo-box button#btn-tap {
-    display: none;
-  }
+  position: relative;
 }
 
 /* ==========================================================================
@@ -920,17 +879,22 @@ body {
   background-color: var(--bg-dark);
   overflow: hidden;
   position: relative;
+  min-height: 0;
+  min-width: 0;
+  flex: 1;
 }
 
 .editor-header {
   background: rgba(0, 0, 0, 0.2);
   border-bottom: 1px solid var(--border);
-  padding: 8px 16px;
+  padding: 8px 14px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-size: 12px;
   color: var(--text-muted);
+  flex-shrink: 0;
+  gap: 10px;
 }
 
 .file-tab {
@@ -939,6 +903,35 @@ body {
   gap: 8px;
   font-weight: 600;
   color: var(--text-main);
+  white-space: nowrap;
+}
+
+/* Boutons d'accès rapide aux panneaux latéraux en mode compact */
+.editor-compact-toggles {
+  display: none;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-compact-drawer {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  color: var(--text-main);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s ease;
+}
+
+.btn-compact-drawer:hover {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: var(--primary);
+  color: #fff;
 }
 
 .editor-wrapper {
@@ -946,6 +939,9 @@ body {
   position: relative;
   overflow: hidden;
   display: flex;
+  min-height: 0;
+  min-width: 0;
+  height: 100%;
 }
 
 .code-editor-container {
@@ -956,6 +952,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
+  min-height: 0;
 }
 
 /* CodeMirror 6 Theming & Modern Styling */
@@ -1405,4 +1402,310 @@ body {
   justify-content: flex-end;
   gap: 10px;
   margin-top: 4px;
+}
+
+/* ==========================================================================
+   SYSTÈME DE MISE À JOUR : POPUP & CARTES DE STATUT PREMIUM
+   ========================================================================== */
+
+.update-modal-card {
+  width: 520px;
+  max-width: 92vw;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(16px);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: modalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalPop {
+  from { transform: scale(0.96) translateY(8px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.update-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 8px 0;
+  gap: 12px;
+}
+
+.update-icon-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.update-icon-circle.success {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 2px solid rgba(16, 185, 129, 0.35);
+  box-shadow: 0 0 24px rgba(16, 185, 129, 0.25);
+}
+
+.update-icon-circle.update-avail {
+  background: rgba(99, 102, 241, 0.15);
+  color: #818cf8;
+  border: 2px solid rgba(99, 102, 241, 0.4);
+  box-shadow: 0 0 24px rgba(99, 102, 241, 0.3);
+}
+
+.update-icon-circle.checking {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border: 2px solid rgba(56, 189, 248, 0.35);
+}
+
+.update-icon-circle.error {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 2px solid rgba(239, 68, 68, 0.35);
+}
+
+.update-icon-circle .feather-icon {
+  width: 28px;
+  height: 28px;
+}
+
+.spin-anim {
+  animation: spin 1.2s linear infinite;
+}
+
+.update-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.3px;
+}
+
+.update-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  max-width: 420px;
+  line-height: 1.5;
+}
+
+.update-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.update-info-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.update-info-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.update-info-val {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Fira Code', monospace;
+}
+
+.update-diff-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: #c7d2fe;
+  font-family: 'Fira Code', monospace;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.update-changelog-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.update-changelog-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.update-changelog-content {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-family: 'Fira Code', monospace;
+  font-size: 11px;
+  color: var(--text-main);
+  max-height: 120px;
+  overflow-y: auto;
+  line-height: 1.6;
+}
+
+.update-progress-bar-wrap {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  position: relative;
+  margin-top: 8px;
+}
+
+.update-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1, #10b981);
+  width: 40%;
+  animation: indeterminateProgress 1.5s infinite linear;
+}
+
+@keyframes indeterminateProgress {
+  0% { transform: translateX(-100%); width: 30%; }
+  50% { width: 60%; }
+  100% { transform: translateX(300%); width: 30%; }
+}
+
+/* ==========================================================================
+   RÈGLES RESPONSIVES GLOBALES (CÔTE-À-CÔTE & REDIMENSIONNEMENT MULTI-FENÊTRE)
+   ========================================================================== */
+
+/* 1. Écrans moyens / Demi-écran de moniteur standard (<= 1050px) */
+@media (max-width: 1050px) {
+  .main-workspace {
+    grid-template-columns: 240px 1fr 240px;
+  }
+  .metro-box {
+    display: none;
+  }
+  .brand-badge {
+    display: none;
+  }
+}
+
+/* 2. Mode Compact / Fenêtre partagée côte-à-côte (<= 920px) */
+@media (max-width: 920px) {
+  .main-workspace {
+    display: flex !important;
+    flex-direction: column !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  .sidebar-left,
+  .sidebar-right {
+    display: none !important;
+  }
+
+  /* Panneaux latéraux accessibles en tiroir overlay */
+  .sidebar-left.drawer-open {
+    display: flex !important;
+    position: absolute !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 290px !important;
+    max-width: 85vw !important;
+    z-index: 70 !important;
+    box-shadow: 6px 0 35px rgba(0, 0, 0, 0.85) !important;
+    border-right: 1px solid var(--border-focus) !important;
+  }
+
+  .sidebar-right.drawer-open {
+    display: flex !important;
+    position: absolute !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    right: 0 !important;
+    width: 290px !important;
+    max-width: 85vw !important;
+    z-index: 70 !important;
+    box-shadow: -6px 0 35px rgba(0, 0, 0, 0.85) !important;
+    border-left: 1px solid var(--border-focus) !important;
+  }
+
+  .editor-compact-toggles {
+    display: flex !important;
+  }
+
+  .center-editor-container {
+    width: 100% !important;
+    height: 100% !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+    min-width: 0 !important;
+  }
+
+  .editor-wrapper {
+    flex: 1 !important;
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+
+  .code-editor-container {
+    height: 100% !important;
+  }
+
+  .cm-editor {
+    height: 100% !important;
+  }
+
+  .cm-scroller {
+    overflow: auto !important;
+    height: 100% !important;
+  }
+
+  .top-actions .btn-action span,
+  .top-actions .btn-update span {
+    display: none;
+  }
+}
+
+/* 3. Mode Ultra-Compact (<= 640px) */
+@media (max-width: 640px) {
+  .transport-bar {
+    padding: 0 8px;
+    gap: 6px;
+    height: 52px;
+  }
+  .brand-title {
+    display: none;
+  }
+  .tempo-box button#btn-tap {
+    display: none;
+  }
+  .titlebar-center {
+    display: none;
+  }
 }
